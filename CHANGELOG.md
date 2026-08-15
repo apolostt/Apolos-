@@ -1,5 +1,23 @@
 # Changelog
 
+## v1.9.1 (3) — čistá fasáda + střecha, terén (kopce), textura stromů, realističtější auto
+
+Reakce na test na reálné mapě.
+
+### Opraveno / změněno
+- **Okna už nejsou na střeše**: fasádní textura přepracovaná (čistá mřížka oken
+  bez opakujících se dveří) + nová **plná střešní čepička** (`kuba-building-roof`),
+  takže vzor oken nikdy neprosakuje na střechu.
+- **Terén / kopce**: přidán výškový DEM (`raster-dem`, terrarium) + 3D terén
+  (`setTerrain`) a **hillshade**, takže kopce a klesání jsou vidět. Vše defenzivně
+  ošetřené — když DEM není dostupný, mapa zůstane placatá a nic se nerozbije.
+- **Stromy mají texturu** (koruny), ne jen zelenou barvu — dlaždicová textura přes
+  `fill-pattern`/`fill-extrusion-pattern` (`ensureTreeImage`).
+- **Realističtější model auta** (zadní pohled): střecha, zadní okno, dvě koncová
+  světla, SPZ, jemné odlesky.
+
+---
+
 ## v1.9.1 (2) — okna na barácích, lesy, okraje silnic
 
 ### Přidáno

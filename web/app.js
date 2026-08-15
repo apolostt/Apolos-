@@ -369,6 +369,38 @@ function setupMapAtmosphere() {
             });
         }
     } catch (_) {}
+    setupTerrain();
+}
+
+// Real 3D terrain (hills up/down) + hillshade from an open elevation DEM.
+// Terrarium tiles are free and need no API key. All wrapped defensively so a
+// blocked/unavailable DEM never breaks the map — it just stays flat.
+function setupTerrain() {
+    try {
+        if (!map.getSource("kuba-dem")) {
+            map.addSource("kuba-dem", {
+                type: "raster-dem",
+                tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
+                encoding: "terrarium", tileSize: 256, maxzoom: 14,
+                attribution: "Elevation: Mapzen / AWS Terrain Tiles"
+            });
+        }
+        if (!map.getLayer("kuba-hillshade")) {
+            const firstSymbol = map.getStyle().layers.find((l) => l.type === "symbol")?.id;
+            map.addLayer({
+                id: "kuba-hillshade", type: "hillshade", source: "kuba-dem",
+                paint: {
+                    "hillshade-exaggeration": 0.45,
+                    "hillshade-shadow-color": "#3f5138",
+                    "hillshade-highlight-color": "#fbfff2",
+                    "hillshade-accent-color": "#6d7f5a"
+                }
+            }, firstSymbol);
+        }
+        if (typeof map.setTerrain === "function") {
+            map.setTerrain({source: "kuba-dem", exaggeration: 1.15});
+        }
+    } catch (_) {}
 }
 let mapErrorShown = false;
 map.on("error", (event) => {
@@ -465,48 +497,68 @@ function ensureTrafficLightImage() {
     map.addImage("kuba-traffic-light", context.getImageData(0, 0, 48, 80), {pixelRatio: 2});
 }
 
-// Procedurally paints a tileable building-facade texture (window grid + ground
-// door) so 3D buildings render with windows and doors instead of flat colour.
+// Procedurally paints a tileable building-facade texture: a clean grid of
+// evenly-spaced windows on a concrete wall with subtle floor bands. No doors
+// (they would repeat unrealistically up the wall); the roof is capped by a
+// separate solid layer so windows never appear on top.
 function ensureFacadeImage() {
     if (map.hasImage("kuba-facade")) return;
-    const W = 96, H = 128;
+    const W = 64, H = 80;
     const canvas = document.createElement("canvas");
     canvas.width = W; canvas.height = H;
     const c = canvas.getContext("2d");
-    // Wall base with a soft vertical shade.
+    // Concrete wall with a gentle vertical shade.
     const wall = c.createLinearGradient(0, 0, W, 0);
-    wall.addColorStop(0, "#c7d2d6"); wall.addColorStop(.5, "#dbe4e6"); wall.addColorStop(1, "#c2ccd0");
+    wall.addColorStop(0, "#cdd6d9"); wall.addColorStop(.5, "#dde5e7"); wall.addColorStop(1, "#c8d1d4");
     c.fillStyle = wall; c.fillRect(0, 0, W, H);
-    // Faint floor slab lines.
-    c.strokeStyle = "rgba(90,110,120,.28)"; c.lineWidth = 1;
-    const cols = 3, rows = 4, padX = 12, padY = 12;
-    const cw = (W - padX * 2) / cols, ch = (H - padY * 2) / rows;
+    const cols = 2, rows = 2, padX = 11, padY = 12;
+    const gapX = 10, gapY = 12;
+    const w = (W - padX * 2 - gapX * (cols - 1)) / cols;
+    const h = (H - padY * 2 - gapY * (rows - 1)) / rows;
+    // Faint slab band above each window row.
+    c.fillStyle = "rgba(120,138,146,.18)";
+    for (let r = 0; r < rows; r++) c.fillRect(0, padY + r * (h + gapY) - 4, W, 3);
     for (let r = 0; r < rows; r++) {
         for (let col = 0; col < cols; col++) {
-            const x = padX + col * cw + 4, y = padY + r * ch + 4;
-            const w = cw - 12, h = ch - 12;
-            // Ground row centre = door, everything else = window.
-            const isDoor = r === rows - 1 && col === 1;
-            if (isDoor) {
-                c.fillStyle = "#5b4632";
-                c.fillRect(x, y - 3, w, h + 7);
-                c.strokeStyle = "#37271a"; c.strokeRect(x, y - 3, w, h + 7);
-                c.fillStyle = "#c9b48c"; c.fillRect(x + w - 6, y + (h + 4) / 2, 3, 4); // handle
-            } else {
-                const glass = c.createLinearGradient(x, y, x + w, y + h);
-                const lit = (r * cols + col) % 5 === 0;
-                glass.addColorStop(0, lit ? "#fff4c4" : "#a9d4e6");
-                glass.addColorStop(.55, lit ? "#ffe79a" : "#7fb3cc");
-                glass.addColorStop(1, lit ? "#f4cf7a" : "#4d7d99");
-                c.fillStyle = glass; c.fillRect(x, y, w, h);
-                c.strokeStyle = "rgba(255,255,255,.65)"; c.strokeRect(x + .5, y + .5, w - 1, h - 1);
-                c.strokeStyle = "#8397a1"; c.strokeRect(x - .5, y - .5, w + 1, h + 1);
-                c.beginPath(); c.moveTo(x + w / 2, y); c.lineTo(x + w / 2, y + h);
-                c.moveTo(x, y + h / 2); c.lineTo(x + w, y + h / 2); c.stroke();
-            }
+            const x = padX + col * (w + gapX), y = padY + r * (h + gapY);
+            const glass = c.createLinearGradient(x, y, x + w, y + h);
+            glass.addColorStop(0, "#cdeaf3"); glass.addColorStop(.5, "#a6cfe0"); glass.addColorStop(1, "#7fb0c6");
+            c.fillStyle = glass; c.fillRect(x, y, w, h);
+            // Diagonal glass reflection.
+            c.fillStyle = "rgba(255,255,255,.35)";
+            c.beginPath(); c.moveTo(x, y + h * .55); c.lineTo(x + w * .55, y); c.lineTo(x + w * .8, y);
+            c.lineTo(x, y + h * .82); c.closePath(); c.fill();
+            // Frame + mullions.
+            c.strokeStyle = "#6f8590"; c.lineWidth = 1.4; c.strokeRect(x, y, w, h);
+            c.strokeStyle = "rgba(90,108,116,.7)"; c.lineWidth = 1;
+            c.beginPath(); c.moveTo(x + w / 2, y); c.lineTo(x + w / 2, y + h); c.stroke();
         }
     }
-    map.addImage("kuba-facade", c.getImageData(0, 0, W, H), {pixelRatio: 3});
+    map.addImage("kuba-facade", c.getImageData(0, 0, W, H), {pixelRatio: 4});
+}
+
+// Tileable tree-canopy texture: clustered round crowns with highlight/shadow so
+// forests read as foliage rather than a flat green blob.
+function ensureTreeImage() {
+    if (map.hasImage("kuba-trees")) return;
+    const S = 72;
+    const canvas = document.createElement("canvas");
+    canvas.width = S; canvas.height = S;
+    const c = canvas.getContext("2d");
+    c.fillStyle = "#4f7f45"; c.fillRect(0, 0, S, S); // forest floor
+    const crown = (cx, cy, r) => {
+        const g = c.createRadialGradient(cx - r * .3, cy - r * .35, r * .2, cx, cy, r);
+        g.addColorStop(0, "#8fd06a"); g.addColorStop(.55, "#5faa4e"); g.addColorStop(1, "#356f31");
+        c.fillStyle = g;
+        c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.fill();
+        c.strokeStyle = "rgba(30,64,28,.5)"; c.lineWidth = 1; c.stroke();
+    };
+    // Crowns placed with wrap-around duplicates so the tile seams stay hidden.
+    const trees = [[16, 14, 12], [44, 20, 14], [26, 40, 13], [56, 48, 12], [12, 58, 11], [62, 12, 9], [38, 62, 10]];
+    for (const [x, y, r] of trees) {
+        for (const dx of [-S, 0, S]) for (const dy of [-S, 0, S]) crown(x + dx, y + dy, r);
+    }
+    map.addImage("kuba-trees", c.getImageData(0, 0, S, S), {pixelRatio: 3});
 }
 
 function addMapLayers() {
@@ -699,6 +751,7 @@ function poiColorExpression() {
 function addDetailLayers() {
     if (!map.getSource("openmaptiles")) return;
     ensureFacadeImage();
+    ensureTreeImage();
     const firstSymbol = map.getStyle().layers.find((layer) => layer.type === "symbol")?.id;
     if (!map.getLayer("kuba-poi-circles")) {
         map.addLayer({
@@ -750,19 +803,23 @@ function addDetailLayers() {
         map.addLayer({
             id: "kuba-forest-fill", type: "fill", source: "openmaptiles", "source-layer": "landcover",
             filter: woodFilter,
-            paint: {"fill-color": ["interpolate", ["linear"], ["zoom"], 8, "#7cbf7a", 14, "#5fae63"],
-                "fill-opacity": ["interpolate", ["linear"], ["zoom"], 8, .35, 14, .58]}
+            paint: {
+                // Foliage texture from above (falls back to green tint via floor colour).
+                "fill-pattern": "kuba-trees",
+                "fill-opacity": ["interpolate", ["linear"], ["zoom"], 8, .55, 14, .9]
+            }
         }, firstSymbol);
-        // Low green extrusion = tree-canopy volume, so forests get 3D depth too.
+        // Low textured extrusion = tree-canopy volume, so forests get 3D depth too.
         map.addLayer({
             id: "kuba-tree-canopy", type: "fill-extrusion", source: "openmaptiles",
             "source-layer": "landcover", minzoom: 14, filter: woodFilter,
             paint: {
+                "fill-extrusion-pattern": "kuba-trees",
                 "fill-extrusion-color": ["interpolate", ["linear"], ["zoom"], 14, "#5aa35c", 18, "#6fc06f"],
                 "fill-extrusion-height": ["interpolate", ["linear"], ["zoom"], 14, 0, 15.4, 9],
                 "fill-extrusion-base": 0,
                 "fill-extrusion-vertical-gradient": true,
-                "fill-extrusion-opacity": ["interpolate", ["linear"], ["zoom"], 14, .3, 16, .6]
+                "fill-extrusion-opacity": ["interpolate", ["linear"], ["zoom"], 14, .45, 16, .8]
             },
             layout: {visibility: state.buildings3d ? "visible" : "none"}
         }, firstSymbol);
@@ -883,6 +940,22 @@ function addDetailLayers() {
             },
             layout: {visibility: state.buildings3d ? "visible" : "none"}
         }, firstSymbol);
+        // Solid roof cap: a thin slab at the very top painted with a plain colour
+        // so the window facade texture never bleeds onto the roof.
+        const roofHeight = ["coalesce", ["to-number", ["get", "render_height"]], 8];
+        map.addLayer({
+            id: "kuba-building-roof", type: "fill-extrusion", source: "openmaptiles",
+            "source-layer": "building", minzoom: 15.4,
+            paint: {
+                "fill-extrusion-color": ["interpolate", ["linear"], roofHeight,
+                    0, "#d7dedf", 40, "#e4ebec", 120, "#eef3f4"],
+                "fill-extrusion-height": roofHeight,
+                "fill-extrusion-base": ["max", 0, ["-", roofHeight, 0.7]],
+                "fill-extrusion-vertical-gradient": false,
+                "fill-extrusion-opacity": 1
+            },
+            layout: {visibility: state.buildings3d ? "visible" : "none"}
+        }, firstSymbol);
     }
     if (!map.getLayer("kuba-house-numbers")) {
         map.addLayer({
@@ -956,23 +1029,20 @@ function userMarker() {
                         <stop offset="0" stop-color="#d7f7ff"/><stop offset=".3" stop-color="#6db9da"/><stop offset="1" stop-color="#174d68"/>
                     </linearGradient>
                 </defs>
-                <ellipse cx="50" cy="69" rx="42" ry="8" fill="rgba(0,13,22,.46)"/>
-                <g fill="#071016" stroke="#596a74" stroke-width="1.3">
-                    <rect x="8" y="46" width="12" height="23" rx="5"/><rect x="80" y="46" width="12" height="23" rx="5"/>
+                <ellipse cx="50" cy="72" rx="39" ry="7" fill="rgba(0,10,18,.42)"/>
+                <g fill="#0b1016" stroke="#39454f" stroke-width="1.2">
+                    <rect x="10" y="40" width="11" height="27" rx="5"/><rect x="79" y="40" width="11" height="27" rx="5"/>
                 </g>
-                <path class="driver-car-body" d="M20 65Q14 61 16 48L23 22Q28 8 50 6Q72 8 77 22L84 48Q86 61 80 65Q67 73 50 73Q33 73 20 65Z" fill="url(#rearBodyPaint)" stroke="#eefaff" stroke-width="2.4"/>
-                <path d="M25 38L30 18Q37 11 50 10Q63 11 70 18L75 38Z" fill="url(#rearGlass)" stroke="#ccefff" stroke-width="1.8"/>
-                <path d="M31 19Q50 12 69 19L72 34H28Z" fill="#236f93" opacity=".5"/>
-                <path d="M22 42Q50 36 78 42L79 54Q50 60 21 54Z" fill="#0b6ca6" opacity=".9"/>
-                <path d="M24 55Q50 61 76 55L77 64Q50 70 23 64Z" fill="#07517f" opacity=".86"/>
-                <path d="M20 48Q50 43 80 48" fill="none" stroke="rgba(255,255,255,.62)" stroke-width="1.5"/>
-                <g class="driver-tail-lights" fill="#ff334d" stroke="#ffe5e8" stroke-width="1.2">
-                    <path d="M20 47Q28 44 37 45L35 55Q27 56 21 53Z"/><path d="M80 47Q72 44 63 45L65 55Q73 56 79 53Z"/>
+                <path class="driver-car-body" d="M22 66Q15 62 16 52L20 30Q23 14 34 10Q42 7 50 7Q58 7 66 10Q77 14 80 30L84 52Q85 62 78 66Q64 72 50 72Q36 72 22 66Z" fill="url(#rearBodyPaint)" stroke="#eaf6ff" stroke-width="1.6"/>
+                <path d="M33 22Q50 17 67 22L64 40Q50 36 36 40Z" fill="#2a4a5e" opacity=".55"/>
+                <path d="M35 41Q50 38 65 41L67 52Q50 56 33 52Z" fill="url(#rearGlass)" stroke="#bfe6f5" stroke-width="1.2"/>
+                <path d="M40 20Q50 17 60 20" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.2"/>
+                <path d="M30 58Q50 62 70 58" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.4"/>
+                <g class="driver-tail-lights" fill="#ff3145" stroke="#ffd9de" stroke-width="1">
+                    <path d="M21 52Q30 50 38 51L37 61Q29 62 22 59Z"/><path d="M79 52Q70 50 62 51L63 61Q71 62 78 59Z"/>
                 </g>
-                <rect x="40" y="54" width="20" height="9" rx="2.5" fill="#f7fbff" stroke="#183b4e" stroke-width="1.2"/>
-                <path d="M44 58h12" stroke="#244654" stroke-width="1.4" stroke-linecap="round"/>
-                <path d="M30 66Q50 70 70 66" fill="none" stroke="#bceaff" stroke-width="2" stroke-linecap="round"/>
-                <circle cx="50" cy="46" r="2.4" fill="#e9f8ff" opacity=".85"/>
+                <rect x="41" y="61" width="18" height="7" rx="1.5" fill="#f4f8fb" stroke="#26424f" stroke-width="1"/>
+                <path d="M44 64.5h12" stroke="#2a4654" stroke-width="1.2" stroke-linecap="round"/>
             </svg>
         </span>
         <span class="marker-symbol marker-walker" aria-hidden="true">
