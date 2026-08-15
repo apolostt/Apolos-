@@ -34,6 +34,8 @@ const ui = {
     remainingDistance: $("remainingDistance"), remainingTime: $("remainingTime"), driverGps: $("driverGps"),
     overspeed: $("overspeed"), primaryArrow: $("primaryArrow"), primaryDistance: $("primaryDistance"),
     primaryTurnCard: $("primaryTurnCard"), turnProgressBar: $("turnProgressBar"),
+    guideSign: $("guideSign"), guideSignArrow: $("guideSignArrow"), guideSignPlace: $("guideSignPlace"),
+    guideSignVia: $("guideSignVia"), guideSignKm: $("guideSignKm"),
     primaryInstruction: $("primaryInstruction"), secondaryTurn: $("secondaryTurn"),
     secondaryArrow: $("secondaryArrow"), secondaryDistance: $("secondaryDistance"),
     speedLimitSign: $("speedLimitSign"), liveSpeed: $("liveSpeed"), speedCircle: $("speedCircle"),
@@ -113,7 +115,8 @@ const state = {
     satelliteFilter: localStorage.getItem("kuba-satellite-filter-v1") === "used" ? "used" : "all",
     signRequest: "", signRequestCenter: null, signTimer: 0,
     lastSignAt: 0, lastSignCenter: null, signPopup: null, roadSignFeatures: [], lastDriverSignUpdateAt: 0,
-    predict: {active: false, base: 0, speed: 0, at: 0, bearing: 0, camBearing: null, lastCamAt: 0},
+    predict: {active: false, base: 0, speed: 0, at: 0, bearing: 0, camBearing: null, lastCamAt: 0,
+        cam: {init: false, lng: 0, lat: 0, bearing: 0}},
     predictFrame: 0, lastTurnMeters: null, lastRawFix: null
 };
 
@@ -537,28 +540,58 @@ function ensureFacadeImage() {
     map.addImage("kuba-facade", c.getImageData(0, 0, W, H), {pixelRatio: 4});
 }
 
-// Tileable tree-canopy texture: clustered round crowns with highlight/shadow so
-// forests read as foliage rather than a flat green blob.
+// Tileable tree-canopy texture, seen from above: many soft, irregular crowns of
+// varied green with soft shadows between them, so forests read as real foliage
+// rather than a hard green grid.
 function ensureTreeImage() {
     if (map.hasImage("kuba-trees")) return;
-    const S = 72;
+    const S = 128;
     const canvas = document.createElement("canvas");
     canvas.width = S; canvas.height = S;
     const c = canvas.getContext("2d");
-    c.fillStyle = "#4f7f45"; c.fillRect(0, 0, S, S); // forest floor
-    const crown = (cx, cy, r) => {
-        const g = c.createRadialGradient(cx - r * .3, cy - r * .35, r * .2, cx, cy, r);
-        g.addColorStop(0, "#8fd06a"); g.addColorStop(.55, "#5faa4e"); g.addColorStop(1, "#356f31");
+    // Dark forest floor so gaps between crowns read as shadow.
+    const floor = c.createLinearGradient(0, 0, S, S);
+    floor.addColorStop(0, "#2f5a2b"); floor.addColorStop(1, "#28501f");
+    c.fillStyle = floor; c.fillRect(0, 0, S, S);
+    // Deterministic pseudo-random so the texture is stable between builds.
+    let seed = 20260815;
+    const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+    const crown = (cx, cy, r, tint) => {
+        c.save();
+        c.shadowColor = "rgba(15,40,14,.55)"; c.shadowBlur = 4; c.shadowOffsetX = 2; c.shadowOffsetY = 3;
+        const g = c.createRadialGradient(cx - r * .35, cy - r * .4, r * .15, cx, cy, r);
+        g.addColorStop(0, tint.hi); g.addColorStop(.5, tint.mid); g.addColorStop(1, tint.lo);
         c.fillStyle = g;
-        c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.fill();
-        c.strokeStyle = "rgba(30,64,28,.5)"; c.lineWidth = 1; c.stroke();
+        c.beginPath();
+        // Slightly lumpy crown outline.
+        const lobes = 9;
+        for (let i = 0; i <= lobes; i++) {
+            const a = (i / lobes) * Math.PI * 2;
+            const rr = r * (0.82 + rnd() * 0.28);
+            const x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr;
+            i ? c.lineTo(x, y) : c.moveTo(x, y);
+        }
+        c.closePath(); c.fill();
+        c.restore();
+        // A few speckles of light for leaf highlights.
+        c.fillStyle = "rgba(190,230,150,.5)";
+        for (let k = 0; k < 3; k++) {
+            c.beginPath();
+            c.arc(cx + (rnd() - .5) * r, cy + (rnd() - .5) * r, 1.1, 0, Math.PI * 2); c.fill();
+        }
     };
-    // Crowns placed with wrap-around duplicates so the tile seams stay hidden.
-    const trees = [[16, 14, 12], [44, 20, 14], [26, 40, 13], [56, 48, 12], [12, 58, 11], [62, 12, 9], [38, 62, 10]];
-    for (const [x, y, r] of trees) {
-        for (const dx of [-S, 0, S]) for (const dy of [-S, 0, S]) crown(x + dx, y + dy, r);
+    const tints = [
+        {hi: "#9ad86f", mid: "#63ad4c", lo: "#3a7a34"},
+        {hi: "#88cc60", mid: "#569c44", lo: "#316b2c"},
+        {hi: "#addf7c", mid: "#6fb455", lo: "#417f37"}
+    ];
+    // Scatter ~26 crowns; draw each with wrap-around copies for a seamless tile.
+    for (let i = 0; i < 26; i++) {
+        const cx = rnd() * S, cy = rnd() * S, r = 9 + rnd() * 10;
+        const tint = tints[(rnd() * tints.length) | 0];
+        for (const dx of [-S, 0, S]) for (const dy of [-S, 0, S]) crown(cx + dx, cy + dy, r, tint);
     }
-    map.addImage("kuba-trees", c.getImageData(0, 0, S, S), {pixelRatio: 3});
+    map.addImage("kuba-trees", c.getImageData(0, 0, S, S), {pixelRatio: 2});
 }
 
 function addMapLayers() {
@@ -753,6 +786,9 @@ function addDetailLayers() {
     ensureFacadeImage();
     ensureTreeImage();
     const firstSymbol = map.getStyle().layers.find((layer) => layer.type === "symbol")?.id;
+    // Flat greenery must sit BELOW roads/buildings, so insert it before the first
+    // line layer (the road network), not before the first label.
+    const firstLine = map.getStyle().layers.find((layer) => layer.type === "line")?.id || firstSymbol;
     if (!map.getLayer("kuba-poi-circles")) {
         map.addLayer({
             id: "kuba-building-colors-2d", type: "fill", source: "openmaptiles", "source-layer": "building",
@@ -798,17 +834,17 @@ function addDetailLayers() {
         map.addLayer({
             id: "kuba-grass-fill", type: "fill", source: "openmaptiles", "source-layer": "landcover",
             filter: grassFilter,
-            paint: {"fill-color": "#bfe3a3", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 8, .25, 14, .42]}
-        }, firstSymbol);
+            paint: {"fill-color": "#bfe3a3", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 8, .22, 14, .36]}
+        }, firstLine);
         map.addLayer({
             id: "kuba-forest-fill", type: "fill", source: "openmaptiles", "source-layer": "landcover",
             filter: woodFilter,
             paint: {
                 // Foliage texture from above (falls back to green tint via floor colour).
                 "fill-pattern": "kuba-trees",
-                "fill-opacity": ["interpolate", ["linear"], ["zoom"], 8, .55, 14, .9]
+                "fill-opacity": ["interpolate", ["linear"], ["zoom"], 8, .6, 14, .95]
             }
-        }, firstSymbol);
+        }, firstLine);
         // Low textured extrusion = tree-canopy volume, so forests get 3D depth too.
         map.addLayer({
             id: "kuba-tree-canopy", type: "fill-extrusion", source: "openmaptiles",
@@ -827,8 +863,8 @@ function addDetailLayers() {
     if (!map.getLayer("kuba-park-fill")) {
         map.addLayer({
             id: "kuba-park-fill", type: "fill", source: "openmaptiles", "source-layer": "park",
-            paint: {"fill-color": "#a9dd97", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 10, .2, 15, .34]}
-        }, firstSymbol);
+            paint: {"fill-color": "#a9dd97", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 10, .18, 15, .3]}
+        }, firstLine);
     }
 
     // --- Crisp road edges (left/right casing) sized so the car marker fits ---
@@ -868,6 +904,39 @@ function addDetailLayers() {
                 ["match", ["get", "class"], ["motorway", "trunk", "primary", "secondary", "tertiary"], true, false]],
             layout: {"line-cap": "butt", "line-join": "round"},
             paint: {"line-color": "rgba(150,164,172,.85)", "line-width": 1.4, "line-dasharray": [3, 4]}
+        }, firstSymbol);
+    }
+
+    // --- Slightly raised sidewalks / footpaths so the kerb is visible ---
+    if (!map.getLayer("kuba-sidewalk")) {
+        const footFilter = ["match", ["get", "subclass"],
+            ["footway", "pedestrian", "sidewalk", "path", "living_street"], true, false];
+        // Dark kerb shadow just below the walkway hints at a small step up.
+        map.addLayer({
+            id: "kuba-sidewalk-kerb", type: "line", source: "openmaptiles", "source-layer": "transportation",
+            minzoom: 16, filter: footFilter,
+            layout: {"line-cap": "round", "line-join": "round"},
+            paint: {"line-color": "rgba(70,86,94,.55)", "line-gap-width": ["interpolate", ["linear"], ["zoom"], 16, 2, 19, 5],
+                "line-width": 1.4, "line-opacity": .8}
+        }, firstSymbol);
+        map.addLayer({
+            id: "kuba-sidewalk", type: "line", source: "openmaptiles", "source-layer": "transportation",
+            minzoom: 16, filter: footFilter,
+            layout: {"line-cap": "round", "line-join": "round"},
+            paint: {"line-color": "#e7ecee", "line-width": ["interpolate", ["linear"], ["zoom"], 16, 2, 19, 5], "line-opacity": .95}
+        }, firstSymbol);
+        // Pedestrian plazas as a low raised slab where the data has polygons.
+        map.addLayer({
+            id: "kuba-sidewalk-plaza", type: "fill-extrusion", source: "openmaptiles", "source-layer": "transportation",
+            minzoom: 16,
+            filter: ["all", ["==", ["geometry-type"], "Polygon"],
+                ["match", ["get", "subclass"], ["pedestrian", "footway"], true, false]],
+            paint: {
+                "fill-extrusion-color": "#e2e8ea",
+                "fill-extrusion-height": ["interpolate", ["linear"], ["zoom"], 16, 0, 16.6, 0.25],
+                "fill-extrusion-base": 0, "fill-extrusion-opacity": .9
+            },
+            layout: {visibility: state.buildings3d ? "visible" : "none"}
         }, firstSymbol);
     }
 
@@ -994,55 +1063,55 @@ function userMarker() {
             <svg class="car-model-svg" viewBox="0 0 64 108" role="presentation">
                 <defs>
                     <linearGradient id="carBodyPaint" x1="0" x2="1">
-                        <stop offset="0" stop-color="#07578f"/><stop offset=".18" stop-color="#159be9"/>
-                        <stop offset=".52" stop-color="#76ceff"/><stop offset=".78" stop-color="#168dd5"/><stop offset="1" stop-color="#064673"/>
+                        <stop offset="0" stop-color="#6d777f"/><stop offset=".22" stop-color="#aab4ba"/>
+                        <stop offset=".52" stop-color="#eef2f4"/><stop offset=".8" stop-color="#9ba5ac"/><stop offset="1" stop-color="#646e76"/>
                     </linearGradient>
                     <linearGradient id="carGlass" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0" stop-color="#dff9ff"/><stop offset=".42" stop-color="#66bbdf"/><stop offset="1" stop-color="#174d70"/>
+                        <stop offset="0" stop-color="#e6f4fa"/><stop offset=".45" stop-color="#8fb8ca"/><stop offset="1" stop-color="#33566a"/>
                     </linearGradient>
                 </defs>
-                <ellipse cx="34" cy="56" rx="25" ry="49" fill="rgba(0,18,29,.34)"/>
-                <g class="car-wheels" fill="#071017" stroke="#52636d" stroke-width="1.2">
-                    <rect x="3" y="20" width="9" height="24" rx="4"/><rect x="52" y="20" width="9" height="24" rx="4"/>
-                    <rect x="3" y="68" width="9" height="24" rx="4"/><rect x="52" y="68" width="9" height="24" rx="4"/>
+                <ellipse cx="32" cy="56" rx="24" ry="50" fill="rgba(0,10,18,.3)"/>
+                <g class="car-wheels" fill="#0c1116" stroke="#3d4750" stroke-width="1">
+                    <rect x="4" y="22" width="8" height="20" rx="3.5"/><rect x="52" y="22" width="8" height="20" rx="3.5"/>
+                    <rect x="4" y="70" width="8" height="20" rx="3.5"/><rect x="52" y="70" width="8" height="20" rx="3.5"/>
                 </g>
-                <path class="car-body" d="M20 3Q32-2 44 3L52 17Q56 38 55 76L49 99Q42 107 32 107Q22 107 15 99L9 76Q8 38 12 17Z" fill="url(#carBodyPaint)" stroke="#f3fbff" stroke-width="2"/>
-                <path d="M15 14Q32 7 49 14L51 34H13Z" fill="#2e9ddb" opacity=".88"/>
-                <path class="car-cabin" d="M17 35L22 22Q32 17 42 22L47 35L46 71L41 82Q32 87 23 82L18 71Z" fill="url(#carGlass)" stroke="#d9f6ff" stroke-width="1.4"/>
-                <path d="M19 37H45L44 48H20Z" fill="#aee8ff" opacity=".82"/>
-                <path d="M20 68H44L42 79Q32 83 22 79Z" fill="#398db3" opacity=".9"/>
-                <path d="M21 50H43V66H21Z" fill="#0f6595" opacity=".78"/>
-                <path d="M32 22V82M17 54H47" stroke="rgba(255,255,255,.36)" stroke-width="1"/>
-                <path d="M14 88Q32 94 50 88L48 99Q32 105 16 99Z" fill="#0c74b6" opacity=".86"/>
-                <g class="car-mirrors" fill="#127ec2" stroke="#e9f8ff" stroke-width="1"><ellipse cx="9" cy="42" rx="5" ry="4"/><ellipse cx="55" cy="42" rx="5" ry="4"/></g>
-                <g class="car-headlights" fill="#fff7a3"><path d="M14 10l8-5 1 7-8 4z"/><path d="M50 10l-8-5-1 7 8 4z"/></g>
-                <g class="car-tail-lights" fill="#ff4055"><path d="M15 91l7 4-2 7-5-4z"/><path d="M49 91l-7 4 2 7 5-4z"/></g>
-                <path d="M25 7h14M24 99h16" stroke="#062d49" stroke-width="2.2" stroke-linecap="round"/>
+                <path class="car-body" d="M22 4Q32 1 42 4Q50 7 52 18L54 40Q55 70 52 88Q50 100 42 104Q32 107 32 107Q24 107 22 104Q14 100 12 88Q9 70 10 40L12 18Q14 7 22 4Z" fill="url(#carBodyPaint)" stroke="#f4f7f9" stroke-width="1.6"/>
+                <path d="M17 16Q32 11 47 16L46 30Q32 27 18 30Z" fill="#c2ccd2" opacity=".65"/>
+                <path class="car-cabin" d="M18 32Q32 28 46 32L45 44Q32 41 19 44Z" fill="url(#carGlass)" stroke="#dfeef5" stroke-width="1"/>
+                <path d="M19 46H45V64H19Z" fill="#aeb8bf"/>
+                <path d="M20 66Q32 63 44 66L45 78Q32 82 19 78Z" fill="url(#carGlass)" stroke="#dfeef5" stroke-width="1"/>
+                <path d="M18 82Q32 86 46 82L45 96Q32 100 19 96Z" fill="#c2ccd2" opacity=".6"/>
+                <path d="M32 12V100" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
+                <g class="car-mirrors" fill="#aab4bb" stroke="#eef4f6" stroke-width="1"><ellipse cx="10" cy="40" rx="4.5" ry="3.5"/><ellipse cx="54" cy="40" rx="4.5" ry="3.5"/></g>
+                <g class="car-headlights" fill="#fbf3c8"><path d="M15 10l9-4 1 6-9 3z"/><path d="M49 10l-9-4-1 6 9 3z"/></g>
+                <g class="car-tail-lights" fill="#e23a44"><path d="M16 96l8 3-1 6-7-3z"/><path d="M48 96l-8 3 1 6 7-3z"/></g>
             </svg>
             <svg class="car-driver-svg" viewBox="0 0 100 78" role="presentation">
                 <defs>
                     <linearGradient id="rearBodyPaint" x1="0" x2="1">
-                        <stop offset="0" stop-color="#054a77"/><stop offset=".18" stop-color="#168ed0"/>
-                        <stop offset=".5" stop-color="#6bc8fb"/><stop offset=".82" stop-color="#1179b8"/><stop offset="1" stop-color="#043855"/>
+                        <stop offset="0" stop-color="#6b757d"/><stop offset=".2" stop-color="#a7b1b8"/>
+                        <stop offset=".5" stop-color="#eef2f4"/><stop offset=".8" stop-color="#98a2a9"/><stop offset="1" stop-color="#626c74"/>
                     </linearGradient>
                     <linearGradient id="rearGlass" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0" stop-color="#d7f7ff"/><stop offset=".3" stop-color="#6db9da"/><stop offset="1" stop-color="#174d68"/>
+                        <stop offset="0" stop-color="#e2f1f8"/><stop offset=".35" stop-color="#8ab4c6"/><stop offset="1" stop-color="#2f5164"/>
                     </linearGradient>
                 </defs>
-                <ellipse cx="50" cy="72" rx="39" ry="7" fill="rgba(0,10,18,.42)"/>
-                <g fill="#0b1016" stroke="#39454f" stroke-width="1.2">
-                    <rect x="10" y="40" width="11" height="27" rx="5"/><rect x="79" y="40" width="11" height="27" rx="5"/>
+                <ellipse cx="50" cy="72" rx="40" ry="7" fill="rgba(0,10,18,.4)"/>
+                <g fill="#0c1116" stroke="#39454f" stroke-width="1.2">
+                    <rect x="9" y="42" width="11" height="26" rx="5"/><rect x="80" y="42" width="11" height="26" rx="5"/>
                 </g>
-                <path class="driver-car-body" d="M22 66Q15 62 16 52L20 30Q23 14 34 10Q42 7 50 7Q58 7 66 10Q77 14 80 30L84 52Q85 62 78 66Q64 72 50 72Q36 72 22 66Z" fill="url(#rearBodyPaint)" stroke="#eaf6ff" stroke-width="1.6"/>
-                <path d="M33 22Q50 17 67 22L64 40Q50 36 36 40Z" fill="#2a4a5e" opacity=".55"/>
-                <path d="M35 41Q50 38 65 41L67 52Q50 56 33 52Z" fill="url(#rearGlass)" stroke="#bfe6f5" stroke-width="1.2"/>
-                <path d="M40 20Q50 17 60 20" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.2"/>
-                <path d="M30 58Q50 62 70 58" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.4"/>
-                <g class="driver-tail-lights" fill="#ff3145" stroke="#ffd9de" stroke-width="1">
-                    <path d="M21 52Q30 50 38 51L37 61Q29 62 22 59Z"/><path d="M79 52Q70 50 62 51L63 61Q71 62 78 59Z"/>
+                <path class="driver-car-body" d="M20 66Q13 61 15 50L18 30Q21 15 33 11Q41 8 50 8Q59 8 67 11Q79 15 82 30L85 50Q87 61 80 66Q65 72 50 72Q35 72 20 66Z" fill="url(#rearBodyPaint)" stroke="#f2f6f8" stroke-width="1.6"/>
+                <path d="M34 20Q50 15 66 20L63 33Q50 30 37 33Z" fill="#9aa4ab" opacity=".7"/>
+                <path d="M35 34Q50 31 65 34L67 47Q50 51 33 47Z" fill="url(#rearGlass)" stroke="#cfe6f0" stroke-width="1.2"/>
+                <path d="M30 50Q50 54 70 50" fill="none" stroke="rgba(232,240,244,.85)" stroke-width="1.6"/>
+                <g class="driver-tail-lights" fill="#e22c3c" stroke="#ffd2d7" stroke-width="1">
+                    <path d="M19 50L36 52L35 58L22 57L20 61L18 55Z"/><path d="M81 50L64 52L65 58L78 57L80 61L82 55Z"/>
                 </g>
-                <rect x="41" y="61" width="18" height="7" rx="1.5" fill="#f4f8fb" stroke="#26424f" stroke-width="1"/>
-                <path d="M44 64.5h12" stroke="#2a4654" stroke-width="1.2" stroke-linecap="round"/>
+                <path d="M50 52V66" stroke="rgba(60,74,82,.5)" stroke-width="1"/>
+                <path d="M24 62Q50 66 76 62L74 68Q50 72 26 68Z" fill="#aeb8bf" opacity=".5"/>
+                <rect x="40" y="60" width="20" height="8" rx="1.5" fill="#f6f9fb" stroke="#2a4654" stroke-width="1"/>
+                <path d="M43 64h14" stroke="#33505d" stroke-width="1" stroke-linecap="round"/>
+                <path d="M40 18Q50 15 60 18" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.1"/>
             </svg>
         </span>
         <span class="marker-symbol marker-walker" aria-hidden="true">
@@ -1200,6 +1269,14 @@ function planRoute(reroute) {
         return;
     }
     if (!state.destination || state.routeRequest) return;
+    // Offline: keep guiding along the already-planned route instead of failing a
+    // reroute that needs the routing server. Turn-by-turn runs fully on-device.
+    if (reroute && typeof navigator !== "undefined" && navigator.onLine === false) {
+        state.rerouting = false;
+        ui.rerouteBadge.classList.add("hidden");
+        showToast("Offline – pokračuji podle naplánované trasy.", false, 3200);
+        return;
+    }
     const id = `route-${++state.requestSequence}`;
     state.routeRequest = {id, reroute};
     state.rerouting = reroute;
@@ -1448,6 +1525,7 @@ function exitDriver(keepRoute = true) {
     ui.overspeed.classList.add("hidden");
     ui.rerouteBadge.classList.add("hidden");
     ui.simulationBadge.classList.add("hidden");
+    if (ui.guideSign) ui.guideSign.classList.add("hidden");
     hideDriverRoadSign();
     updateLiveRoadSign(null);
     try { Native.keepScreenOn(false); } catch (_) {}
@@ -1532,6 +1610,7 @@ function updateNavigation(location, immediate = false) {
     const remainingSeconds = Math.max(0, state.route.totalSeconds * ratio);
     ui.remainingDistance.textContent = formatDistance(remaining);
     ui.remainingTime.textContent = `${formatDuration(remainingSeconds)} · ${formatArrival(remainingSeconds)}`;
+    updateGuideSign(remaining);
     updateSpeed(location);
     updateDriverRoadSign(progress, location);
 
@@ -1583,6 +1662,7 @@ function renderTurnGuidance(progress) {
     let primaryIndex = maneuvers.findIndex((m) => m.progress >= progress + 8 || m.type === 4);
     if (primaryIndex < 0) primaryIndex = maneuvers.length - 1;
     const primary = maneuvers[primaryIndex];
+    state.currentPrimary = primary;
     const meters = Math.max(0, primary.progress - progress);
     ui.primaryArrow.textContent = arrowFor(primary.type);
     ui.primaryDistance.textContent = countdownLabel(meters);
@@ -1612,6 +1692,28 @@ function renderTurnGuidance(progress) {
     }
 }
 
+// Motorway-style guide sign at the top: destination town, next direction arrow
+// and remaining kilometres — like a green road direction sign.
+function updateGuideSign(remaining) {
+    if (!ui.guideSign) return;
+    if (!state.navigating || !state.destination) { ui.guideSign.classList.add("hidden"); return; }
+    ui.guideSignPlace.textContent = destinationTown(state.destination.label) || "Cíl";
+    const p = state.currentPrimary;
+    ui.guideSignArrow.textContent = p ? arrowFor(p.type) : "↑";
+    const via = p && p.instruction ? p.instruction : "";
+    ui.guideSignVia.textContent = via.length > 30 ? `${via.slice(0, 29)}…` : via;
+    ui.guideSignKm.textContent = formatDistance(remaining);
+    ui.guideSign.classList.remove("hidden");
+}
+
+// Pulls the town out of a formatted address label (drops street + postcode).
+function destinationTown(label) {
+    if (!label) return "";
+    const parts = String(label).split(",").map((s) => s.trim()).filter(Boolean);
+    let last = parts[parts.length - 1] || String(label);
+    return last.replace(/^\d{3}\s?\d{2}\s*/, "").trim();
+}
+
 // Chase/overhead camera helper, shared by the fix handler and the render loop.
 function driveCamera(lat, lon, bearing, duration) {
     const chaseView = state.mode === "auto";
@@ -1633,7 +1735,26 @@ function driveCamera(lat, lon, bearing, duration) {
 function startPredictLoop() {
     if (state.predictFrame) return;
     state.predict.lastCamAt = 0;
+    state.predict.cam.init = false;
     state.predictFrame = requestAnimationFrame(predictTick);
+}
+
+// Buttery chase camera: every animation frame it eases the map centre and bearing
+// toward the target with a fixed damping factor via jumpTo, instead of firing a
+// throttled easeTo (which visibly steps). The centre is aimed ahead of the car so
+// the car sits in the lower third of the screen.
+function smoothChaseCamera(lat, lon, bearing) {
+    const chase = state.mode === "auto";
+    const zoom = chase ? 19.1 : 19.2;
+    const pitch = chase ? 76 : 60;
+    const ahead = projectAhead(lat, lon, bearing, chase ? 58 : 72);
+    const cam = state.predict.cam;
+    if (!cam.init) { cam.lng = ahead.lon; cam.lat = ahead.lat; cam.bearing = bearing; cam.init = true; }
+    const k = 0.18;
+    cam.lng += (ahead.lon - cam.lng) * k;
+    cam.lat += (ahead.lat - cam.lat) * k;
+    cam.bearing = bearingStep(cam.bearing, bearing, k);
+    map.jumpTo({center: [cam.lng, cam.lat], bearing: cam.bearing, zoom, pitch});
 }
 
 function stopPredictLoop() {
@@ -1666,10 +1787,7 @@ function predictTick(now) {
         updateMarkerAppearance({speedKmh});
         setUserMarkerPosition({lon: here[0], lat: here[1], bearing: smoothBearing, speedKmh});
 
-        if (state.follow && now - state.predict.lastCamAt > 180) {
-            state.predict.lastCamAt = now;
-            driveCamera(here[1], here[0], smoothBearing, 190);
-        }
+        if (state.follow) smoothChaseCamera(here[1], here[0], smoothBearing);
     }
     renderTurnGuidance(predicted);
     state.predictFrame = requestAnimationFrame(predictTick);

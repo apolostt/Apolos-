@@ -1103,6 +1103,15 @@ body.driver .maplibregl-ctrl-bottom-right { display: none; }
     .quick-chip { font-size: 9px; }
 }
 
+/* --- Motorway-style guide sign (town + arrow + km) at the top during nav --- */
+.guide-sign { position: absolute; top: 92px; left: 50%; transform: translateX(-50%); z-index: 24; display: flex; align-items: center; gap: 11px; width: max-content; max-width: min(92vw, 470px); padding: 8px 15px; border-radius: 15px; background: linear-gradient(180deg, #0c9350, #06693a); border: 2px solid rgba(255,255,255,.9); box-shadow: 0 12px 30px rgba(0,25,12,.45), inset 0 1px 0 rgba(255,255,255,.25); color: #fff; pointer-events: none; }
+.guide-sign.hidden { display: none; }
+.guide-sign-arrow { flex: 0 0 auto; font-size: 27px; font-weight: 900; line-height: 1; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+.guide-sign-body { display: flex; flex-direction: column; min-width: 0; }
+.guide-sign-body b { font-size: 18px; font-weight: 900; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.guide-sign-body small { font-size: 10px; font-weight: 700; opacity: .88; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.guide-sign-km { flex: 0 0 auto; margin-left: 6px; padding-left: 11px; border-left: 1.5px solid rgba(255,255,255,.5); font-size: 17px; font-weight: 900; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
 /* --- Live metre-countdown proximity bar under the primary turn --- */
 .turn-progress { position: relative; height: 6px; margin-top: 8px; border-radius: 999px; background: rgba(120,255,226,.14); overflow: hidden; }
 .turn-progress i { position: absolute; left: 0; top: 0; height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--brand), var(--blue)); box-shadow: 0 0 10px rgba(50,240,196,.5); transition: width .18s linear, background .3s ease; }

@@ -1,5 +1,29 @@
 # Changelog
 
+## v1.9.1 (4) — zeleň pod silnice, realistické stromy, Octavia, směrová cedule, plynulejší kamera, offline
+
+Reakce na test na reálné mapě (celá mapa byla zelená, textura stromů kostkovaná).
+
+### Opraveno
+- **Zeleň už nepřekrývá silnice a budovy**: lesy/tráva/parky se vkládají POD
+  silniční vrstvu (`firstLine`), ne nad ni — cesty a domy jsou zase vidět.
+- **Realistická textura stromů**: měkké nepravidelné koruny s vlastními stíny
+  místo kostkované mřížky.
+
+### Přidáno / změněno
+- **Model auta jako Škoda Octavia**: přerýsovaný stříbrný liftback (střecha,
+  zadní okno, chromová lišta, C-koncová světla, SPZ) — pohled shora i zezadu.
+- **Plynulejší jízda**: kamera nově vyhlazuje polohu i směr každý snímek přes
+  `jumpTo` (dřív trhaný throttled `easeTo`).
+- **Směrová cedule nahoře** (`guideSign`): zelená dálniční cedule s cílovým
+  městem, šipkou a kolika km — jako navádění na dálnici.
+- **Chodníky mírně vyvýšené**: světlý chodník s obrubníkovým stínem a nízká
+  vyvýšená dlažba u pěších zón, aby byl vidět rozdíl.
+- **Offline jízda**: když vypadne signál, navigace pokračuje podle naplánované
+  trasy (vše běží v telefonu); přepočet se offline přeskočí s hláškou místo chyby.
+
+---
+
 ## v1.9.1 (3) — čistá fasáda + střecha, terén (kopce), textura stromů, realističtější auto
 
 Reakce na test na reálné mapě.
