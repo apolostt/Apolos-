@@ -1,0 +1,4 @@
+# Build scratch
+.build/
+*.idsig
+dist/*.idsig
