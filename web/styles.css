@@ -955,15 +955,17 @@ button { cursor: pointer; }
 .marker-symbol { position: absolute; display: none; filter: drop-shadow(0 4px 5px rgba(0,20,35,.42)); }
 .mode-auto .marker-car { left: 6px; top: 0; width: 46px; height: 68px; display: block; transform-origin: 50% 50%; }
 .car-model-svg { width: 100%; height: 100%; display: block; overflow: visible; filter: drop-shadow(0 6px 5px rgba(0,17,29,.58)); }
-.car-driver-svg { width: 100%; height: 100%; display: none; overflow: visible; filter: drop-shadow(0 8px 6px rgba(0,12,20,.68)); }
+.car-driver-svg { width: 100%; height: 100%; display: none; overflow: visible; filter: drop-shadow(0 7px 6px rgba(0,10,18,.72)) saturate(1.18) contrast(1.06) brightness(1.03); }
+/* Contact shadow beneath the driving car so it sits on the road. */
+body.driver .mode-auto .marker-car::after { content: ""; position: absolute; left: 50%; bottom: 4px; width: 78%; height: 12px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(0,14,24,.5), transparent); pointer-events: none; z-index: -1; }
 .car-model-svg .car-body { stroke-linejoin: round; }
 .car-model-svg .car-cabin { filter: drop-shadow(0 1px 1px rgba(255,255,255,.28)); }
 .car-model-svg .car-headlights { filter: drop-shadow(0 -1px 3px rgba(255,247,164,.92)); }
 .car-driver-svg .driver-car-body { stroke-linejoin: round; }
 .car-driver-svg .driver-tail-lights { filter: drop-shadow(0 0 4px rgba(255,37,65,.85)); }
-body.driver .user-marker.mode-auto { width: 82px; height: 66px; }
-body.driver .user-marker.mode-auto .marker-halo { top: 69%; width: 70px; height: 24px; border-color: rgba(69,167,255,.28); background: rgba(6,33,48,.2); box-shadow: 0 7px 18px rgba(0,20,32,.48); animation: none; }
-body.driver .mode-auto .marker-car { left: 50%; top: 50%; width: 78px; height: 61px; transform: translate(-50%,-50%); }
+body.driver .user-marker.mode-auto { width: 56px; height: 48px; }
+body.driver .user-marker.mode-auto .marker-halo { top: 70%; width: 50px; height: 18px; border-color: rgba(69,167,255,.28); background: rgba(6,33,48,.2); box-shadow: 0 6px 15px rgba(0,20,32,.48); animation: none; }
+body.driver .mode-auto .marker-car { left: 50%; top: 50%; width: 52px; height: 42px; transform: translate(-50%,-50%); }
 body.driver .mode-auto .marker-car .car-model-svg { display: none; }
 body.driver .mode-auto .marker-car .car-driver-svg { display: block; }
 .mode-pedestrian .marker-walker { left: 13px; top: 4px; width: 28px; height: 50px; display: block; }

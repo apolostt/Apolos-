@@ -425,6 +425,10 @@ function ensureTrafficLightImage() {
     context.strokeStyle = "rgba(255,255,255,.86)";
     context.stroke();
     const lamp = (y, bright, dark) => {
+        // Outer glow so the active lamps read as genuinely lit.
+        context.save();
+        context.shadowColor = bright;
+        context.shadowBlur = 8;
         const gradient = context.createRadialGradient(20, y - 3, 1, 24, y, 9);
         gradient.addColorStop(0, "#ffffff");
         gradient.addColorStop(.13, bright);
@@ -434,8 +438,19 @@ function ensureTrafficLightImage() {
         context.beginPath();
         context.arc(24, y, 9, 0, Math.PI * 2);
         context.fill();
-        context.strokeStyle = "rgba(255,255,255,.2)";
+        context.restore();
+        // Glossy top highlight.
+        const gloss = context.createLinearGradient(24, y - 8, 24, y + 2);
+        gloss.addColorStop(0, "rgba(255,255,255,.55)");
+        gloss.addColorStop(1, "rgba(255,255,255,0)");
+        context.fillStyle = gloss;
+        context.beginPath();
+        context.ellipse(24, y - 3, 5, 3, 0, 0, Math.PI * 2);
+        context.fill();
+        context.strokeStyle = "rgba(255,255,255,.28)";
         context.lineWidth = 1;
+        context.beginPath();
+        context.arc(24, y, 9, 0, Math.PI * 2);
         context.stroke();
     };
     lamp(14, "#ff5b68", "#a50018");
@@ -448,6 +463,50 @@ function ensureTrafficLightImage() {
     context.ellipse(24, 76, 11, 3, 0, 0, Math.PI * 2);
     context.fill();
     map.addImage("kuba-traffic-light", context.getImageData(0, 0, 48, 80), {pixelRatio: 2});
+}
+
+// Procedurally paints a tileable building-facade texture (window grid + ground
+// door) so 3D buildings render with windows and doors instead of flat colour.
+function ensureFacadeImage() {
+    if (map.hasImage("kuba-facade")) return;
+    const W = 96, H = 128;
+    const canvas = document.createElement("canvas");
+    canvas.width = W; canvas.height = H;
+    const c = canvas.getContext("2d");
+    // Wall base with a soft vertical shade.
+    const wall = c.createLinearGradient(0, 0, W, 0);
+    wall.addColorStop(0, "#c7d2d6"); wall.addColorStop(.5, "#dbe4e6"); wall.addColorStop(1, "#c2ccd0");
+    c.fillStyle = wall; c.fillRect(0, 0, W, H);
+    // Faint floor slab lines.
+    c.strokeStyle = "rgba(90,110,120,.28)"; c.lineWidth = 1;
+    const cols = 3, rows = 4, padX = 12, padY = 12;
+    const cw = (W - padX * 2) / cols, ch = (H - padY * 2) / rows;
+    for (let r = 0; r < rows; r++) {
+        for (let col = 0; col < cols; col++) {
+            const x = padX + col * cw + 4, y = padY + r * ch + 4;
+            const w = cw - 12, h = ch - 12;
+            // Ground row centre = door, everything else = window.
+            const isDoor = r === rows - 1 && col === 1;
+            if (isDoor) {
+                c.fillStyle = "#5b4632";
+                c.fillRect(x, y - 3, w, h + 7);
+                c.strokeStyle = "#37271a"; c.strokeRect(x, y - 3, w, h + 7);
+                c.fillStyle = "#c9b48c"; c.fillRect(x + w - 6, y + (h + 4) / 2, 3, 4); // handle
+            } else {
+                const glass = c.createLinearGradient(x, y, x + w, y + h);
+                const lit = (r * cols + col) % 5 === 0;
+                glass.addColorStop(0, lit ? "#fff4c4" : "#a9d4e6");
+                glass.addColorStop(.55, lit ? "#ffe79a" : "#7fb3cc");
+                glass.addColorStop(1, lit ? "#f4cf7a" : "#4d7d99");
+                c.fillStyle = glass; c.fillRect(x, y, w, h);
+                c.strokeStyle = "rgba(255,255,255,.65)"; c.strokeRect(x + .5, y + .5, w - 1, h - 1);
+                c.strokeStyle = "#8397a1"; c.strokeRect(x - .5, y - .5, w + 1, h + 1);
+                c.beginPath(); c.moveTo(x + w / 2, y); c.lineTo(x + w / 2, y + h);
+                c.moveTo(x, y + h / 2); c.lineTo(x + w, y + h / 2); c.stroke();
+            }
+        }
+    }
+    map.addImage("kuba-facade", c.getImageData(0, 0, W, H), {pixelRatio: 3});
 }
 
 function addMapLayers() {
@@ -639,6 +698,7 @@ function poiColorExpression() {
 
 function addDetailLayers() {
     if (!map.getSource("openmaptiles")) return;
+    ensureFacadeImage();
     const firstSymbol = map.getStyle().layers.find((layer) => layer.type === "symbol")?.id;
     if (!map.getLayer("kuba-poi-circles")) {
         map.addLayer({
@@ -665,18 +725,95 @@ function addDetailLayers() {
         }, firstSymbol);
         map.addLayer({
             id: "kuba-poi-labels", type: "symbol", source: "openmaptiles", "source-layer": "poi",
-            minzoom: 14, filter: activePoiFilter(),
+            minzoom: 13, filter: activePoiFilter(),
             layout: {
+                // Live shop/venue name straight from the OSM/OpenMapTiles data.
                 "text-field": ["coalesce", ["get", "name:cs"], ["get", "name"]],
                 "text-font": ["Noto Sans Regular"],
-                "text-size": ["interpolate", ["linear"], ["zoom"], 14, 8, 17, 10.5, 20, 12.5],
-                "text-offset": [0, 1.35], "text-anchor": "top", "text-max-width": 10,
-                "text-optional": true, "text-padding": 7,
+                "text-size": ["interpolate", ["linear"], ["zoom"], 13, 8.5, 17, 11, 20, 13.5],
+                "text-offset": [0, 1.3], "text-anchor": "top", "text-max-width": 11,
+                "text-optional": true, "text-padding": 3,
                 "text-allow-overlap": false, "symbol-sort-key": ["coalesce", ["get", "rank"], 30]
             },
             paint: {"text-color": "#18303e", "text-halo-color": "rgba(255,255,255,.96)", "text-halo-width": 1.7}
         }, firstSymbol);
     }
+    // --- Forests, woods and greenery (from live OpenMapTiles landcover) ---
+    if (!map.getLayer("kuba-forest-fill")) {
+        const woodFilter = ["match", ["get", "class"], ["wood", "forest", "tree", "scrub"], true, false];
+        const grassFilter = ["match", ["get", "class"], ["grass", "meadow", "heath", "wetland"], true, false];
+        map.addLayer({
+            id: "kuba-grass-fill", type: "fill", source: "openmaptiles", "source-layer": "landcover",
+            filter: grassFilter,
+            paint: {"fill-color": "#bfe3a3", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 8, .25, 14, .42]}
+        }, firstSymbol);
+        map.addLayer({
+            id: "kuba-forest-fill", type: "fill", source: "openmaptiles", "source-layer": "landcover",
+            filter: woodFilter,
+            paint: {"fill-color": ["interpolate", ["linear"], ["zoom"], 8, "#7cbf7a", 14, "#5fae63"],
+                "fill-opacity": ["interpolate", ["linear"], ["zoom"], 8, .35, 14, .58]}
+        }, firstSymbol);
+        // Low green extrusion = tree-canopy volume, so forests get 3D depth too.
+        map.addLayer({
+            id: "kuba-tree-canopy", type: "fill-extrusion", source: "openmaptiles",
+            "source-layer": "landcover", minzoom: 14, filter: woodFilter,
+            paint: {
+                "fill-extrusion-color": ["interpolate", ["linear"], ["zoom"], 14, "#5aa35c", 18, "#6fc06f"],
+                "fill-extrusion-height": ["interpolate", ["linear"], ["zoom"], 14, 0, 15.4, 9],
+                "fill-extrusion-base": 0,
+                "fill-extrusion-vertical-gradient": true,
+                "fill-extrusion-opacity": ["interpolate", ["linear"], ["zoom"], 14, .3, 16, .6]
+            },
+            layout: {visibility: state.buildings3d ? "visible" : "none"}
+        }, firstSymbol);
+    }
+    if (!map.getLayer("kuba-park-fill")) {
+        map.addLayer({
+            id: "kuba-park-fill", type: "fill", source: "openmaptiles", "source-layer": "park",
+            paint: {"fill-color": "#a9dd97", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 10, .2, 15, .34]}
+        }, firstSymbol);
+    }
+
+    // --- Crisp road edges (left/right casing) sized so the car marker fits ---
+    if (!map.getLayer("kuba-road-edge")) {
+        const driveFilter = ["all",
+            ["==", ["geometry-type"], "LineString"],
+            ["match", ["get", "class"],
+                ["motorway", "trunk", "primary", "secondary", "tertiary", "minor", "residential", "service", "living_street"],
+                true, false]
+        ];
+        const roadWidth = (base) => ["interpolate", ["exponential", 1.5], ["zoom"],
+            13, ["match", ["get", "class"], ["motorway", "trunk"], base * 0.5, base * 0.3],
+            16, ["match", ["get", "class"], "motorway", base * 0.9, ["trunk", "primary"], base * 0.8, base * 0.6],
+            19, ["match", ["get", "class"],
+                "motorway", base * 2.0, "trunk", base * 1.8, "primary", base * 1.6,
+                "secondary", base * 1.45, "tertiary", base * 1.3, base]];
+        map.addLayer({
+            id: "kuba-road-edge", type: "line", source: "openmaptiles", "source-layer": "transportation",
+            minzoom: 14, filter: driveFilter,
+            layout: {"line-cap": "round", "line-join": "round"},
+            paint: {"line-color": "#5c6d76", "line-width": roadWidth(30), "line-opacity": 0.9}
+        }, firstSymbol);
+        map.addLayer({
+            id: "kuba-road-fill", type: "line", source: "openmaptiles", "source-layer": "transportation",
+            minzoom: 14, filter: driveFilter,
+            layout: {"line-cap": "round", "line-join": "round"},
+            paint: {
+                "line-color": ["match", ["get", "class"],
+                    ["motorway", "trunk"], "#ffe6a6", ["primary", "secondary"], "#fff4d6", "#f7fbfd"],
+                "line-width": roadWidth(24), "line-opacity": 0.96
+            }
+        }, firstSymbol);
+        // Dashed centre line for a real lane feel.
+        map.addLayer({
+            id: "kuba-road-centre", type: "line", source: "openmaptiles", "source-layer": "transportation",
+            minzoom: 16.5, filter: ["all", driveFilter,
+                ["match", ["get", "class"], ["motorway", "trunk", "primary", "secondary", "tertiary"], true, false]],
+            layout: {"line-cap": "butt", "line-join": "round"},
+            paint: {"line-color": "rgba(150,164,172,.85)", "line-width": 1.4, "line-dasharray": [3, 4]}
+        }, firstSymbol);
+    }
+
     const pathFilter = ["any",
         ["==", ["get", "subclass"], "cycleway"],
         ["match", ["get", "bicycle"], ["yes", "designated", "official"], true, false]
@@ -721,13 +858,17 @@ function addDetailLayers() {
             paint: {"text-color": "#1b2730", "text-halo-color": "#ffffff", "text-halo-width": 4, "text-halo-blur": .3}
         });
     }
-    const hasBuildings3d = map.getStyle().layers.some((layer) => layer.type === "fill-extrusion");
+    // Only treat *building* extrusions as pre-existing — the tree canopy is also a
+    // fill-extrusion and must not suppress our own 3D buildings layer.
+    const hasBuildings3d = map.getStyle().layers.some((layer) =>
+        layer.type === "fill-extrusion" && (layer["source-layer"] === "building" || layer.id === "kuba-buildings-3d"));
     if (!hasBuildings3d && !map.getLayer("kuba-buildings-3d")) {
         map.addLayer({
             id: "kuba-buildings-3d", type: "fill-extrusion", source: "openmaptiles",
             "source-layer": "building", minzoom: 14,
             paint: {
-                // Shade taller structures lighter for legible urban depth.
+                // Window/door facade texture on the walls; tints taller blocks lighter.
+                "fill-extrusion-pattern": "kuba-facade",
                 "fill-extrusion-color": ["interpolate", ["linear"],
                     ["coalesce", ["to-number", ["get", "render_height"]], 8],
                     0, "#c1d0d1", 18, "#d0dbdb", 55, "#e0e8e9", 140, "#eef3f4"],
@@ -737,7 +878,8 @@ function addDetailLayers() {
                 "fill-extrusion-base": ["interpolate", ["linear"], ["zoom"],
                     14, 0, 15.3, ["coalesce", ["to-number", ["get", "render_min_height"]], 0]],
                 "fill-extrusion-vertical-gradient": true,
-                "fill-extrusion-opacity": 0.92
+                // Fully opaque so buildings read as solid volumes.
+                "fill-extrusion-opacity": 1
             },
             layout: {visibility: state.buildings3d ? "visible" : "none"}
         }, firstSymbol);
@@ -1132,8 +1274,19 @@ function clearRoute() {
     updateLiveRoadSign(null);
 }
 
+// Forces the highest-accuracy location profile so the OS engages every available
+// GNSS constellation (GPS + Galileo + GLONASS + BeiDou) for the tightest fix.
+function forcePreciseLocation() {
+    if (state.locationProfile === "precise") return;
+    state.locationProfile = "precise";
+    try { Native.setLocationProfile("precise"); } catch (_) {}
+    document.querySelectorAll("[data-location-profile]").forEach((button) =>
+        button.classList.toggle("active", button.dataset.locationProfile === "precise"));
+}
+
 function enterDriver(simulating) {
     closeDrawerMenu();
+    if (!simulating) forcePreciseLocation();
     state.navigating = true;
     state.simulating = !!simulating;
     state.follow = true;
@@ -1397,8 +1550,8 @@ function driveCamera(lat, lon, bearing, duration) {
         ? -Math.round(clamp(window.innerHeight * .04, 32, 45))
         : -Math.round(clamp(window.innerHeight * .17, 120, 185));
     map.easeTo({
-        center: [ahead.lon, ahead.lat], zoom: chaseView ? 18.75 : 19.2,
-        pitch: chaseView ? 78 : 60, bearing,
+        center: [ahead.lon, ahead.lat], zoom: chaseView ? 19.1 : 19.2,
+        pitch: chaseView ? 76 : 60, bearing,
         offset: [0, driverOffset], duration, essential: true
     });
 }
@@ -2884,10 +3037,14 @@ function setBuildingAppearance() {
     const heightPalette = ["interpolate", ["linear"], ["to-number", ["get", "render_height"], 8],
         0, "#f2d6a2", 7, "#a7d8c7", 14, "#84b9e7", 26, "#c09ce2", 55, "#ed9d92"];
     const palette = ["case", ["has", "colour"], ["to-color", ["get", "colour"]], heightPalette];
+    // Only recolour genuine building extrusions — never the tree canopy or other
+    // extrusion layers — and keep buildings fully opaque (the facade texture shows).
     for (const layer of map.getStyle().layers) {
         if (layer.type !== "fill-extrusion") continue;
+        const isBuilding = layer.id === "kuba-buildings-3d" || layer["source-layer"] === "building";
+        if (!isBuilding) continue;
         map.setPaintProperty(layer.id, "fill-extrusion-color", state.buildingColors ? palette : neutral);
-        map.setPaintProperty(layer.id, "fill-extrusion-opacity", state.buildingColors ? .82 : .72);
+        map.setPaintProperty(layer.id, "fill-extrusion-opacity", 1);
         try { map.setPaintProperty(layer.id, "fill-extrusion-vertical-gradient", true); } catch (_) {}
     }
     setDetailVisibility("kuba-building-colors-2d", state.buildingColors);
