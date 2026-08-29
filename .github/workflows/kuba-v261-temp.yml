@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
     paths: ['.github/workflows/kuba-v261-temp.yml']
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
