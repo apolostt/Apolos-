@@ -1,0 +1,10 @@
+# Build mezivýstupy (generují se skriptem build-apk.sh)
+/build/
+*.class
+
+# Lokální toolchain
+/.gradle/
+/local.properties
+
+# v4 podpisový artefakt
+*.idsig

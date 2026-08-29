@@ -1,0 +1,68 @@
+# pattern	brand	model	category	confidence	reason
+apple inc|apple, inc|apple watch|offline finding|find my	Apple	Apple zařízení: Watch, AirTag, AirPods nebo iPhone podle vysílaných dat	TRACKER	82	Apple výrobce/služba v BLE reklamě; přesný typ ověř podle názvu a opakovaného výskytu
+samsung electronics|galaxy watch|smarttag|fd5a|fd4b	Samsung	Samsung zařízení: Galaxy Watch, Buds, SmartTag nebo telefon	WEARABLE	82	Samsung výrobce/služba v BLE reklamě; přesný typ určuje název/služby
+garmin|cycling speed|cycling power|location and navigation|running speed	Garmin / sportovní senzor	Sportovní hodinky, cyklo počítač nebo senzor	WEARABLE	90	Sportovní BLE služby odpovídají hodinkám nebo senzoru
+fitbit|body composition|weight scale|heart rate	Google Fitbit / zdravotní senzor	Fitness náramek, hodinky nebo zdravotní senzor	WEARABLE	88	Zdravotní BLE služby odpovídají wearable zařízení
+amazfit|zepp|huami	Amazfit / Zepp	Amazfit/Zepp hodinky nebo fitness náramek	WEARABLE	92	Výrobce nebo název odpovídá Amazfit/Zepp wearable zařízení
+xiaomi|mi band|smart band|fc46	Xiaomi	Xiaomi/Mi Band nebo chytré BLE zařízení	WEARABLE	86	Xiaomi název/služba odpovídá náramku nebo chytrému zařízení
+huawei|honor band|huawei watch	Huawei / Honor	Huawei/Honor hodinky, náramek nebo telefon	WEARABLE	86	Huawei/Honor výrobce nebo název odpovídá nositelnému zařízení
+oppo|oneplus|realme|bbk electronics	Oppo / OnePlus / Realme	Chytré hodinky, náramek, telefon nebo audio	WEARABLE	82	BBK/Oppo/OnePlus/Realme výrobce nebo název odpovídá wearable/audio zařízení
+ticwatch|mobvoi	Mobvoi	TicWatch chytré hodinky	WEARABLE	90	Mobvoi/TicWatch profil odpovídá chytrým hodinkám
+polar|suunto|coros|whoop|withings|oura|ultrahuman	Health/Wearable	Sportovní nebo zdravotní wearable senzor	WEARABLE	88	Sportovní/zdravotní BLE služby nebo značka odpovídají wearable zařízení
+haylou|mibro|colmi|kospet|lemfo	Budget Wearable	Dostupné chytré hodinky nebo fitness náramek	WEARABLE	82	Běžná značka levnějších wearable zařízení
+tile|feed|feec|fd84	Tile	Tile tracker nebo kompatibilní BLE tag	TRACKER	94	Tile služba nebo název v BLE reklamě
+chipolo|pebblebee|smarttrack|cube tracker|nut tracker	Bluetooth tracker	Bluetooth sledovací tag	TRACKER	92	Známý název nebo profil BLE trackeru
+orbit|trackr|baseus t2|nutale|fynd|locator tag	Bluetooth tracker	Bluetooth sledovací tag nebo lokátor	TRACKER	88	Známý nebo typický profil Bluetooth lokátoru
+earbud|headset|headphones|microphone control|audio stream control|media control|broadcast audio|volume control|airpods|galaxy buds	Audio	Bluetooth sluchátka, headset nebo audio vysílač	AUDIO	90	Audio BLE služba nebo appearance odpovídá zvukovému zařízení
+soundcore|anker|redmi buds|xiaomi buds|beats|nothing ear|cmf buds|jabra|sennheiser|skullcandy|edifier	Audio	Bluetooth sluchátka, headset nebo reproduktor	AUDIO	88	Známá audio značka nebo audio BLE profil
+asus|asustek|rog|zenfone|tuf	ASUS	Asus/ROG telefon, periferie, router nebo audio	BLUETOOTH	82	Asus/ROG název nebo výrobce v datech zařízení
+camera|webcam|ipcam|onvif|rtsp|hikvision|dahua|reolink|ezviz|imou|axis|uniview	Kamera	Síťová kamera, NVR/DVR nebo kamerový modul	CAMERA	84	Název, výrobce nebo síťová služba odpovídá kameře
+v380|yoosee|icsee|xmeye|a9 camera|sq11|mini cam|hidden camera|spy cam	Kamera / Spy zařízení	Možná skrytá kamera, Wi‑Fi kamera nebo kamerový modul	CAMERA	80	Název nebo profil odpovídá častým levným kamerovým/spy aplikacím
+nordic semiconductor|nrf52|nrf53	Nordic Semiconductor	Nordic nRF BLE senzor, tracker nebo IoT modul	IOT	84	Nordic BLE čip se často používá v senzorech a trackerech
+telink|dialog semiconductor|silicon labs|bk343|rtl8762|phyplus|jieli|bestechnic	BLE čipset	BLE čip v hodinkách, sluchátkách, senzoru nebo trackeru	IOT	76	Čipset často používaný v BLE spotřebních zařízeních
+espressif|esp32|esp8266	Espressif	ESP32/ESP8266 IoT modul	IOT	88	Výrobce/název odpovídá IoT modulu
+raspberry pi	Raspberry Pi	Raspberry Pi nebo embedded Linux zařízení	IOT	88	Výrobce/název odpovídá malému embedded zařízení
+tuya|smart life|matter|homekit|hap	Smart Home	Chytrá domácnost / IoT zařízení	SMART_HOME	86	Smart-home služba nebo název odpovídá IoT zařízení
+shelly|aqara|sonoff|ewelink|yeelight|philips hue|hue bridge|nanoleaf|tapo|kasa smart|meross|switchbot|govee|tradfri|wiz connected	Smart Home	Chytrá domácnost: světlo, zásuvka, senzor nebo gateway	SMART_HOME	90	Výrobce, název nebo služba odpovídá smart-home zařízení
+matter|homekit|hap|thread|zigbee|ble mesh|mesh light|occupancy sensor|contact sensor|leak sensor|smoke sensor|humidity sensor|temperature sensor	Smart Home	Matter/HomeKit/Thread/Zigbee nebo BLE senzor chytré domácnosti	SMART_HOME	88	Smart-home služba nebo BLE appearance odpovídá domácímu senzoru
+xiaomi scooter|mi scooter|m365|ninebot|segway|kickscooter|scooter|e-scooter|escooter|niu|kukirin|kugoo|dualtron|kaabo|inmotion	Koloběžka / vozidlo	Elektrokoloběžka nebo dopravní BLE modul	SCOOTER	88	Název, výrobce nebo BLE data odpovídají koloběžce
+e-bike|ebike|bosch ebike|bafang|shimano steps|vanmoof|specialized levo|giant ridecontrol|surron|sur-ron	Koloběžka / vozidlo	E-bike nebo dopravní BLE modul	SCOOTER	84	Název nebo profil odpovídá e-bike zařízení
+hikvision|dahua|ezviz|imou|reolink|uniview|vivotek|arlo|wyze|ubiquiti|rtsp|onvif|networkvideotransmitter|nvr|dvr	Kamera	Síťová kamera, NVR/DVR nebo kamerový modul	CAMERA	90	Výrobce nebo lokální služba odpovídá kameře
+iphone|ipad|pixel|galaxy s|galaxy a|galaxy z|redmi note|poco|oneplus|oppo|realme|vivo|motorola|nothing phone|phone	Telefon / tablet	Telefon nebo tablet	PHONE	82	Název, výrobce nebo Bluetooth třída odpovídá telefonu
+macbook|imac|windows|laptop|notebook|desktop|workstation|synology|qnap|nas|_smb._tcp|_workstation._tcp	Computer	Počítač, notebook, NAS nebo pracovní stanice	COMPUTER	86	Lokální služba nebo název odpovídá počítači/NAS
+lenovo|hp inc|dell|acer|asustek|micro-star|msi|intel corporate|raspberry pi	Computer	Počítač, notebook, Raspberry Pi nebo síťový modul	COMPUTER	80	Výrobce odpovídá počítači nebo embedded Linux zařízení
+tp-link|ubiquiti|mikrotik|zyxel|netgear|d-link|mercusys|tenda|xiaomi router|asus router	Network	Síťový router, repeater nebo access point	NETWORK	78	Výrobce nebo název odpovídá síťovému prvku
+logitech|razer|steelseries|corsair|hid over gatt|human interface device	Peripheral	Klávesnice, myš, ovladač nebo HID periferie	BLUETOOTH	84	HID služba nebo výrobce odpovídá periferii
+dualsense|dualshock|xbox wireless|joy-con|gamepad|controller	Gamepad	Herní ovladač / gamepad	BLUETOOTH	88	Název nebo HID profil odpovídá gamepadu
+elm327|obdii|obd2|vlinker|veepeak|carista|thinkdiag|topdon|launch obd	Vehicle	OBD diagnostika nebo automobilový Bluetooth modul	SCOOTER	82	Název nebo profil odpovídá vozidlovému modulu
+tesla|bmw|audi|volkswagen|skoda|seat|ford sync|toyota|hyundai|kia|car audio|handsfree	Vehicle	Auto Bluetooth/audio nebo telematika	SCOOTER	76	Název nebo profil odpovídá autu či dopravnímu zařízení
+roborock|dreame|ecovacs|deebot|irobot|roomba|xiaomi vacuum|dyson|mijia	Smart Home	Robotický vysavač nebo smart-home spotřebič	SMART_HOME	86	Název/výrobce odpovídá chytrému domácímu spotřebiči
+ring|arlo|wyze|blink|eufycam|nest cam|doorbell|video doorbell|foscam|vstarcam|camhi	Kamera	Chytrá kamera, zvonek nebo IP kamera	CAMERA	88	Výrobce nebo služba odpovídá kameře/zvonku
+ambarella|hisilicon|sigmastar|ingenic|goke|xiongmai|novatek|fullhan|xm camera	Kamera	Kamerový čipset nebo embedded video modul	CAMERA	82	Čipset nebo modul se často používá v kamerách/NVR
+chromecast|googlecast|airplay|raop|mediarenderer|dlna|roku|fire tv|android tv|samsung tv|lg webos	Media	TV, streamer, AirPlay/Chromecast nebo DLNA zařízení	AUDIO	82	Lokální služba odpovídá streamovacímu/multimediálnímu zařízení
+ipp|printer|scanner|canon|epson|brother|laserjet|officejet|pixma|xerox|ricoh|kyocera	Printer	Tiskárna, skener nebo multifunkční zařízení	NETWORK	82	Název nebo mDNS/SSDP služba odpovídá tiskárně
+broadcom|mediatek|qualcomm|atheros|realtek|intel corporate|lite-on|azurewave|murata|hon hai	Chipset	Komunikační Wi‑Fi/Bluetooth modul	NETWORK	70	Výrobce je čipset nebo komunikační modul; přesný výrobek určuje název/služby
+apple nearby|nearby interaction|offline finding|0x004c|find my|openhaystack	Apple Find My	Apple Find My kompatibilní zařízení nebo tag	TRACKER	90	Apple Nearby/Offline Finding data odpovídají lokalizačnímu zařízení
+samsung fd5a|samsung fd4b|smartthings find|smarttag	Samsung SmartThings	Samsung SmartTag nebo SmartThings zařízení	TRACKER	88	Samsung lokalizační služba nebo název odpovídá trackeru
+tile|chipolo|pebblebee|eufy smarttrack|cube tracker|nut tracker|key finder|locator tag	Tracker	Bluetooth tag, lokátor nebo key finder	TRACKER	92	Profil odpovídá trackeru/lokátoru
+samsung electronics|samsung electro-mechanics|smartthings|one ui|galaxy s|galaxy a|galaxy z|galaxy note|galaxy tab|sm-g|sm-a|sm-s|sm-f|sm-n	Samsung	Samsung Galaxy telefon/tablet podle výrobce, názvu nebo prefixu	PHONE	88	Samsung výrobce nebo modelový prefix odpovídá telefonu/tabletu
+galaxy watch|galaxy fit|galaxy ring|wear os|sm-r3|sm-r4|sm-r5|sm-r8|sm-r9|sm-l3	Samsung	Samsung Galaxy Watch/Fit/Ring	WEARABLE	92	Samsung wearable název, služba nebo prefix odpovídá hodinkám/náramku/prstenu
+galaxy buds|buds live|buds pro|buds2|buds3|audio stream control|media control|sm-r17|sm-r18|sm-r19	Samsung	Samsung Galaxy Buds nebo audio zařízení	AUDIO	90	Samsung audio název nebo BLE audio služba odpovídá sluchátkům
+google|pixel watch|pixel buds|pixel phone|fast pair	Google	Google Pixel, Fast Pair nebo Android zařízení	PHONE	82	Google/Fast Pair data naznačují telefon, hodinky nebo audio zařízení
+qualcomm|mediatek|broadcom|murata|lite-on|hon hai|azurewave|realtek|intel corporate|samsung electro-mechanics	Komunikační modul	Wi‑Fi/Bluetooth čipset nebo rádiový modul	NETWORK	72	Výrobce je pravděpodobně rádiový modul; přesný výrobek určuje název, služby a opakovaný výskyt
+hid over gatt|human interface device|battery service|device information|generic access|generic attribute	Bluetooth periferie	BLE HID/periferie, ovladač, klávesnice, tracker nebo senzor	BLUETOOTH	76	Zařízení vysílá obecné BLE služby; pro přesnější typ sleduj název, appearance a výrobce
+heart rate|body sensor|blood pressure|glucose|running speed|cycling speed|cycling power|location and navigation	Zdravotní wearable	Hodinky, fitness náramek nebo sportovní senzor	WEARABLE	88	Zdravotní/sportovní BLE služby odpovídají nositelnému zařízení
+proximity|immediate alert|link loss|tx power|find me|locator	Tracker / lokátor	Bluetooth lokátor, tag nebo zařízení s dohledáváním	TRACKER	84	Proximity/alert služby odpovídají lokalizačnímu nebo sledovacímu profilu
+google llc|google inc|pixel|fast pair|0x00e0	Google	Pixel telefon, Watch, Buds, Nest nebo Fast Pair zařízení	PHONE	84	Google výrobce nebo Fast Pair profil v reklamních datech
+sony corporation|sony interactive|xperia|xq-|so-0	Sony	Sony Xperia, audio, TV, PlayStation nebo senzor	PHONE	84	Sony výrobce nebo modelový prefix v datech zařízení
+motorola mobility|motorola solutions|moto g|moto edge|razr	Motorola	Motorola telefon nebo příslušenství	PHONE	88	Motorola výrobce nebo modelová řada v datech zařízení
+lenovo|thinkphone|legion|lenovo tab	Lenovo	Lenovo telefon, tablet, počítač nebo příslušenství	PHONE	82	Lenovo výrobce nebo modelová řada v datech zařízení
+oppo|oneplus|realme|vivo|iqoo|bbk electronics|coloros	BBK značky	Oppo, OnePlus, Realme, Vivo nebo iQOO zařízení	PHONE	84	Výrobce nebo systémový název odpovídá značkám BBK
+hmd global|hmd device|nokia mobile	Nokia / HMD	Nokia nebo HMD telefon/tablet	PHONE	88	Výrobce odpovídá Nokia/HMD mobilnímu zařízení
+nothing technology|nothing phone|cmf by nothing	Nothing / CMF	Nothing nebo CMF telefon, hodinky či audio	PHONE	88	Výrobce nebo název odpovídá Nothing/CMF
+transsion|tecno mobile|infinix mobility|itel mobile	Transsion	Tecno, Infinix nebo Itel telefon	PHONE	86	Výrobce odpovídá mobilní značce skupiny Transsion
+zte corporation|nubia|redmagic|red magic	ZTE / Nubia	ZTE, Nubia nebo RedMagic telefon	PHONE	88	Výrobce nebo značka odpovídá telefonu ZTE/Nubia
+meizu technology|meizu|mblu	Meizu	Meizu telefon nebo příslušenství	PHONE	86	Výrobce odpovídá zařízení Meizu
+harman|jbl|akg|bose|sennheiser|jabra|marshall|audio-technica	Audio značky	Sluchátka, reproduktor, headset nebo automobilové audio	AUDIO	90	Známý výrobce profesionálního nebo spotřebního audio zařízení
+hid over gatt|scan parameters|device information|battery service	Bluetooth periferie	Klávesnice, myš, ovladač, senzor nebo obecná BLE periferie	BLUETOOTH	74	Kombinace obecných GATT služeb odpovídá Bluetooth periferii
+fitness machine|user data|pulse oximeter|continuous glucose|environmental sensing	Senzor	Fitness, zdravotní nebo environmentální BLE senzor	WEARABLE	84	Specializované Bluetooth služby odpovídají senzoru nebo wearable zařízení

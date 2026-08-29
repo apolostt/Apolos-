@@ -1,0 +1,89 @@
+# pattern	brand	model	category	confidence	reason
+apple watch|watchos|iwatch	Apple	Apple Watch	WEARABLE	97	Název odpovídá Apple Watch
+galaxy watch|gear s|sm-r8|sm-r9|sm-l3	Samsung	Samsung Galaxy Watch	WEARABLE	97	Název odpovídá Samsung Galaxy Watch
+fitbit|sense 2|versa|charge 6|charge 5|inspire 3	Google Fitbit	Fitbit hodinky nebo náramek	WEARABLE	96	Název odpovídá Fitbit zařízení
+garmin|fenix|forerunner|venu|vivoactive|instinct	Garmin	Garmin hodinky nebo senzor	WEARABLE	96	Název odpovídá Garmin zařízení
+amazfit|zepp|gtr|gts|bip|t-rex	Amazfit / Zepp	Amazfit hodinky nebo náramek	WEARABLE	94	Název odpovídá Amazfit/Zepp zařízení
+mi band|smart band|redmi band|xiaomi band	Xiaomi	Xiaomi Smart Band / Mi Band	WEARABLE	94	Název odpovídá Xiaomi fitness náramku
+huawei watch|honor band|huawei band	Huawei / Honor	Huawei/Honor hodinky nebo náramek	WEARABLE	94	Název odpovídá Huawei/Honor nositelnému zařízení
+polar|whoop|withings|suunto|coros	Health/Wearable	Fitness hodinky nebo sportovní senzor	WEARABLE	90	Název odpovídá sportovnímu wearable zařízení
+honor watch|honor choice	Honor	Honor Watch / Honor Band	WEARABLE	93	Název odpovídá Honor nositelnému zařízení
+oppo watch|oneplus watch|realme watch	Oppo / OnePlus / Realme	Chytré hodinky nebo náramek BBK značek	WEARABLE	91	Název odpovídá Oppo/OnePlus/Realme wearable zařízení
+ticwatch|mobvoi	Mobvoi	TicWatch chytré hodinky	WEARABLE	92	Název odpovídá Mobvoi/TicWatch
+haylou|mibro|colmi|kospet|lemfo	Budget Wearable	Dostupné chytré hodinky nebo náramek	WEARABLE	86	Název odpovídá běžným levnějším wearable značkám
+whoop|oura ring|ultrahuman	Health/Wearable	Zdravotní wearable senzor nebo prsten	WEARABLE	92	Název odpovídá wearable zdravotnímu senzoru
+airtag	Apple	Apple AirTag	TRACKER	99	Název odpovídá AirTag
+smarttag|smart tag	Samsung	Samsung Galaxy SmartTag	TRACKER	99	Název odpovídá Samsung SmartTag
+tile mate|tile pro|tile slim|tile sticker|tile tracker	Tile	Tile tracker	TRACKER	98	Název odpovídá trackeru Tile
+chipolo	Chipolo	Chipolo tracker	TRACKER	98	Název odpovídá trackeru Chipolo
+pebblebee	Pebblebee	Pebblebee tracker	TRACKER	98	Název odpovídá trackeru Pebblebee
+smarttrack|smart track	Eufy	Eufy SmartTrack	TRACKER	96	Název odpovídá trackeru Eufy
+fynd|orbit|trackr|baseus t2|nut|nutale	Bluetooth tracker	Bluetooth sledovací tag	TRACKER	90	Název odpovídá levnějším Bluetooth trackerům
+airpods|galaxy buds|freebuds|earbuds|earbud|headphones|headset|jbl|bose|sony wf|sony wh|marshall	Audio	Bluetooth sluchátka nebo audio zařízení	AUDIO	90	Název odpovídá sluchátkům nebo audio zařízení
+soundcore|anker|redmi buds|xiaomi buds|beats|nothing ear|cmf buds|jabra|sennheiser|skullcandy|edifier	Audio	Bluetooth sluchátka nebo reproduktor	AUDIO	90	Název odpovídá známému audio zařízení
+rog|asus|zenfone|tuf	ASUS	Asus / ROG telefon, periferie nebo audio	BLUETOOTH	84	Název odpovídá Asus/ROG zařízení
+spy|hidden cam|mini cam|ipcam|a9 camera|sq11|v380|yoosee	Kamera / Spy zařízení	Možná skrytá kamera nebo sledovací zařízení	CAMERA	78	Název odpovídá kamerovému nebo spy profilu
+esp32|esp8266|nrf52|nrf53|raspberry pi|arduino|tuya|smart life	IoT	IoT modul nebo senzor	IOT	86	Název odpovídá IoT/embedded zařízení
+noise watch|fire-boltt|boat wave|boat lunar|zeblaze|dt no.1|no.1 watch|imiki|imilab|zebronics	Wearable	Další chytré hodinky nebo fitness náramek	WEARABLE	84	Název odpovídá běžným wearable značkám
+honor band|honor watch|huawei band|huawei watch|watch fit	Huawei / Honor	Huawei/Honor Watch nebo Band	WEARABLE	94	Název odpovídá Huawei/Honor hodinkám nebo náramku
+pixel watch|fossil watch|withings|scanwatch|vivomove|forerunner|fenix|instinct|venu	Wearable	Chytré nebo sportovní hodinky	WEARABLE	90	Název odpovídá chytrým/sportovním hodinkám
+sony wf|sony wh|linkbuds|jbl tune|jbl wave|bose qc|marshall minor|marshall major|anker soundcore|soundcore liberty|soundcore life	Audio	Bluetooth sluchátka nebo reproduktor	AUDIO	91	Název odpovídá známým audio zařízením
+xiaomi scooter|mi scooter|m365|ninebot|segway|kickscooter|e-scooter|escooter|niu scooter|kukirin|kugoo|dualtron|kaabo|inmotion scooter	Koloběžka / vozidlo	Elektrokoloběžka nebo dopravní BLE zařízení	SCOOTER	90	Název odpovídá koloběžce nebo dopravnímu zařízení
+e-bike|ebike|bosch ebike|bafang|shimano steps|vanmoof|specialized levo|giant ridecontrol|surron|sur-ron	Koloběžka / vozidlo	E-bike nebo dopravní BLE zařízení	SCOOTER	86	Název odpovídá e-bike nebo dopravnímu modulu
+tuya|smart life|ewelink|sonoff|shelly|aqara|yeelight|philips hue|hue bridge|nanoleaf|tapo|kasa smart|meross|switchbot|govee|tradfri	Smart Home	Chytrá domácnost: zásuvka, světlo, senzor nebo gateway	SMART_HOME	90	Název odpovídá smart-home zařízení
+matter|homekit|hap|thread border|zigbee bridge|ble mesh|mesh light	Smart Home	Matter/HomeKit/Thread/Zigbee chytré zařízení	SMART_HOME	88	Název nebo služba odpovídá chytré domácnosti
+hikvision|dahua|ezviz|imou|reolink|uniview|vivotek|arlo|wyze|ubiquiti camera|goke|xiongmai|xmeye	Kamera	Síťová kamera, NVR/DVR nebo kamerový modul	CAMERA	90	Název odpovídá kamerovému zařízení
+onvif|rtsp|nvr|dvr|ip camera|wifi camera|web camera|netcam|network camera	Kamera	Síťová kamera nebo video streamovací zařízení	CAMERA	88	Název/služba odpovídá kameře
+iphone|ipad|pixel phone|galaxy s|galaxy a|galaxy z|redmi note|poco|oneplus|oppo|realme|vivo|motorola|nothing phone	Telefon / tablet	Telefon nebo tablet	PHONE	84	Název odpovídá telefonu nebo tabletu
+macbook|imac|windows pc|laptop|notebook|desktop|workstation|synology|qnap|nas|raspberrypi|raspberry pi	Computer	Počítač, notebook, NAS nebo Raspberry Pi	COMPUTER	86	Název odpovídá počítači nebo síťovému úložišti
+anker soundcore|liberty air|liberty 4|life q|space a|space q|anker speaker	Anker Soundcore	Sluchátka nebo reproduktor Soundcore	AUDIO	92	Název odpovídá audio zařízení Soundcore
+sony headphones|wf-1000|wh-1000|linkbuds|ult wear|srs-x|sony speaker	Sony	Sony sluchátka nebo reproduktor	AUDIO	92	Název odpovídá Sony audio zařízení
+jbl flip|jbl charge|jbl live|jbl tune|jbl wave|jbl go|jbl clip	JBL	JBL sluchátka nebo reproduktor	AUDIO	92	Název odpovídá JBL audio zařízení
+bose quietcomfort|bose qc|bose soundlink|bose earbuds	Bose	Bose sluchátka nebo reproduktor	AUDIO	92	Název odpovídá Bose audio zařízení
+sennheiser momentum|sennheiser cx|sennheiser accentum	Sennheiser	Sennheiser sluchátka	AUDIO	91	Název odpovídá Sennheiser audio zařízení
+jabra elite|jabra evolve|jabra speak	Jabra	Jabra headset nebo reproduktor	AUDIO	91	Název odpovídá Jabra audio zařízení
+edifier|skullcandy|marshall emberton|marshall stanmore|creative sound|tribit|ugreen buds	Audio	Bluetooth audio zařízení	AUDIO	88	Název odpovídá běžné audio značce
+logitech|mx keys|mx master|k380|k400|g502|razer|steelseries|corsair mouse|corsair keyboard	Peripheral	Klávesnice, myš, ovladač nebo periferie	BLUETOOTH	84	Název odpovídá Bluetooth periferii
+dualsense|dualshock|xbox wireless|joy-con|pro controller|gamepad|controller	Gamepad	Herní ovladač / gamepad	BLUETOOTH	88	Název odpovídá hernímu ovladači
+obdii|obd2|elm327|vlinker|veepeak|carista|thinkdiag|topdon|launch obd	Vehicle	OBD diagnostika nebo automobilový Bluetooth modul	SCOOTER	82	Název odpovídá dopravnímu/vozidlovému BT modulu
+tesla|bmw|audi|volkswagen|vw bluetooth|skoda|seat|ford sync|toyota|hyundai bluetooth|kia bluetooth	Vehicle	Auto Bluetooth/audio nebo telematický modul	SCOOTER	78	Název odpovídá automobilovému Bluetooth zařízení
+roborock|dreame|ecovacs|deebot|irobot|roomba|xiaomi vacuum|dyson|mijia	Smart Home	Robotický vysavač nebo chytré domácí zařízení	SMART_HOME	88	Název odpovídá smart-home spotřebiči
+ring camera|ring chime|arlo camera|wyze cam|blink camera|eufycam|eufy cam|nest cam|google nest	Kamera	Chytrá kamera nebo zvonek	CAMERA	90	Název odpovídá domácí kameře nebo video zvonku
+doorbell|video doorbell|cam hi|camhi|littlelf|yi camera|xiaovv|vstarcam|foscam	Kamera	Wi‑Fi kamera nebo video zvonek	CAMERA	86	Název odpovídá běžné IP/Wi‑Fi kameře
+mikrotik|ubiquiti|unifi|tp-link|mercusys|tenda|netgear|d-link|zyxel|fritzbox|asus router|xiaomi router	Network	Router, access point nebo síťový prvek	NETWORK	82	Název odpovídá síťovému zařízení
+canon|epson|brother|hp printer|deskjet|laserjet|officejet|pixma|xerox|ricoh|kyocera	Printer	Tiskárna nebo multifunkce	NETWORK	84	Název odpovídá tiskárně nebo skeneru
+chromecast|google tv|android tv|bravia|lg webos|samsung tv|tizen tv|roku|fire tv|mi tv	Media	TV, streamer nebo multimediální zařízení	AUDIO	82	Název odpovídá TV/streamovacímu zařízení
+amazfit bip|amazfit gtr|amazfit gts|amazfit t-rex|zepp e|zepp z	Amazfit / Zepp	Amazfit/Zepp konkrétní řada	WEARABLE	96	Název odpovídá modelové řadě Amazfit/Zepp
+mi smart band|xiaomi smart band|redmi smart band|redmi watch|xiaomi watch|miband	Xiaomi	Xiaomi/Redmi hodinky nebo náramek	WEARABLE	96	Název odpovídá Xiaomi/Redmi wearable zařízení
+galaxy fit|galaxy ring|sm-r390|sm-r400|sm-r500|sm-r800|sm-r900|sm-r910|sm-r920	Samsung	Samsung wearable zařízení	WEARABLE	96	Název nebo model odpovídá Samsung wearable zařízení
+airtag|air tag|findmy|find my|openhaystack|nearby interaction	Apple Find My	Apple Find My kompatibilní tag nebo zařízení	TRACKER	96	Název/služba odpovídá Find My trackeru
+tile|chipolo|pebblebee|eufy smarttrack|smarttrack link|cube key finder|nutale|orbit key finder	Tracker	Bluetooth lokátor / key finder	TRACKER	94	Název odpovídá trackeru nebo lokátoru
+galaxy s|galaxy a|galaxy z|galaxy note|galaxy tab|samsung phone|one ui|sm-g|sm-a|sm-s|sm-f|sm-n	Samsung	Samsung Galaxy telefon nebo tablet	PHONE	92	Název/modelový prefix odpovídá Samsung telefonu nebo tabletu
+galaxy buds|buds2|buds3|buds live|buds pro|sm-r17|sm-r18|sm-r19	Samsung	Samsung Galaxy Buds / audio	AUDIO	93	Název nebo modelový prefix odpovídá Samsung audio zařízení
+galaxy watch|galaxy fit|galaxy ring|gear s|sm-r3|sm-r4|sm-r5|sm-r8|sm-r9|sm-l3	Samsung	Samsung Galaxy Watch/Fit/Ring	WEARABLE	97	Název nebo modelový prefix odpovídá Samsung wearable zařízení
+smartthings find|smartthings tag|galaxy smarttag|smarttag2|ei-t5600|ei-t5300	Samsung SmartThings	Samsung SmartTag / SmartThings Find tracker	TRACKER	98	Název odpovídá Samsung lokalizačnímu tagu
+pixel watch|pixel buds|pixel phone|google pixel	Google	Google Pixel telefon, hodinky nebo audio zařízení	PHONE	88	Název odpovídá Google Pixel zařízení
+mi watch|xiaomi watch|redmi watch|redmi smart band|xiaomi smart band|miband|mi band	Xiaomi	Xiaomi/Redmi hodinky nebo náramek	WEARABLE	96	Název odpovídá Xiaomi/Redmi nositelnému zařízení
+xiaomi buds|redmi buds|poco buds|mi true wireless	Xiaomi	Xiaomi/Redmi/Poco sluchátka	AUDIO	90	Název odpovídá Xiaomi/Redmi audio zařízení
+xiaomi home|mijia|mi home|aqara|yeelight|roborock|dreame	Xiaomi / Mijia	Xiaomi chytrá domácnost nebo spotřebič	SMART_HOME	88	Název odpovídá Xiaomi/Mijia smart-home zařízení
+hidden bluetooth|unknown bluetooth|ble device|bt tracker|locator|key finder	Bluetooth zařízení	Skryté nebo obecné BLE zařízení	BLUETOOTH	72	Název odpovídá anonymnímu Bluetooth vysílání; přesný typ určí služby a výrobce
+pixel 6|pixel 7|pixel 8|pixel 9|pixel fold|pixel tablet	Google Pixel	Google Pixel telefon nebo tablet	PHONE	95	Název odpovídá modelové řadě Google Pixel
+pixel buds|pixel watch|google fast pair	Google	Pixel Buds, Pixel Watch nebo Fast Pair zařízení	WEARABLE	90	Název odpovídá ekosystému Google Pixel/Fast Pair
+xperia|sony mobile|so-0|xq-	Sony	Sony Xperia telefon nebo tablet	PHONE	93	Název nebo modelový prefix odpovídá Sony Xperia
+moto g|moto edge|motorola edge|razr|moto e|moto one	Motorola	Motorola Moto / Edge / Razr telefon	PHONE	94	Název odpovídá telefonu Motorola
+lenovo tab|legion phone|legion y|thinkphone	Lenovo	Lenovo tablet, Legion nebo ThinkPhone	PHONE	91	Název odpovídá mobilnímu zařízení Lenovo
+oneplus|cph2|oppo find|oppo reno|oppo a|coloros	Oppo / OnePlus	Oppo nebo OnePlus telefon	PHONE	91	Název nebo modelový prefix odpovídá Oppo/OnePlus telefonu
+realme|rmx|realme gt|realme c|realme narzo	Realme	Realme telefon	PHONE	93	Název nebo modelový prefix odpovídá telefonu Realme
+vivo v|vivo x|vivo y|iqoo|vivo phone	Vivo / iQOO	Vivo nebo iQOO telefon	PHONE	91	Název odpovídá telefonu Vivo/iQOO
+nokia|hmd pulse|hmd skyline|hmd fusion|hmd global	Nokia / HMD	Nokia nebo HMD telefon/tablet	PHONE	93	Název odpovídá telefonu Nokia/HMD
+nothing phone|pong|spacewar	Nothing	Nothing Phone	PHONE	92	Název nebo interní označení odpovídá Nothing Phone
+cmf phone|cmf watch|cmf buds	CMF by Nothing	CMF telefon, hodinky nebo sluchátka	PHONE	88	Název odpovídá zařízení CMF by Nothing
+tecno|camon|phantom|spark|infinix|zero |hot |note |itel	Transsion	Tecno, Infinix nebo Itel telefon	PHONE	88	Název odpovídá telefonu skupiny Transsion
+zte|nubia|redmagic|red magic|axon|blade	ZTE / Nubia	ZTE, Nubia nebo RedMagic telefon	PHONE	91	Název odpovídá telefonu ZTE/Nubia
+meizu|mblu	Meizu	Meizu telefon nebo příslušenství	PHONE	88	Název odpovídá zařízení Meizu
+surface duo|surface headphones|surface earbuds	Microsoft	Microsoft Surface mobilní nebo audio zařízení	PHONE	86	Název odpovídá zařízení Microsoft Surface
+fairphone|shiftphone	Fairphone / SHIFT	Opravitelný Android telefon	PHONE	92	Název odpovídá telefonu Fairphone/SHIFT
+jbl|harman|akg|infinity audio	Harman / JBL	Sluchátka, reproduktor nebo automobilové audio	AUDIO	90	Název odpovídá audio značce Harman/JBL
+bose|quietcomfort|soundlink|frames tenor	Bose	Bose sluchátka, reproduktor nebo audio brýle	AUDIO	93	Název odpovídá audio zařízení Bose
+sennheiser|momentum|accentum|cx true wireless	Sennheiser	Sennheiser sluchátka nebo headset	AUDIO	93	Název odpovídá audio zařízení Sennheiser
+jabra|elite 4|elite 8|evolve|speak2	Jabra	Jabra sluchátka, headset nebo konferenční reproduktor	AUDIO	93	Název odpovídá audio zařízení Jabra

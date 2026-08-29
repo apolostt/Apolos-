@@ -1,0 +1,287 @@
+0081	Device – Desktop Workstation
+0082	Device – Server-class Computer
+0083	Device – Laptop
+0084	Device – Handheld PC/PDA (clamshell)
+0085	Device – Palm-size PC/PDA
+0086	Device – Wearable computer (watch size)
+0087	Device – Tablet
+0088	Device – Docking Station
+0089	Device – All in One
+008A	Device – Blade Server
+008B	Device – Convertible
+008C	Device – Detachable
+008D	Device – IoT Gateway
+008E	Device – Mini PC
+008F	Device – Stick PC
+00C1	Device – Sports Watch
+00C2	Device – Smartwatch
+0301	Device – Ear Thermometer
+0341	Device – Heart Rate Belt
+0381	Device – Arm Blood Pressure
+0382	Device – Wrist Blood Pressure
+03C1	Device – Keyboard
+03C2	Device – Mouse
+03C3	Device – Joystick
+03C4	Device – Gamepad
+03C5	Device – Digitizer Tablet
+03C6	Device – Card Reader
+03C7	Device – Digital Pen
+03C8	Device – Barcode Scanner
+03C9	Device – Touchpad
+03CA	Device – Presentation Remote
+0441	Device – In-Shoe Running Walking Sensor
+0442	Device – On-Shoe Running Walking Sensor
+0443	Device – On-Hip Running Walking Sensor
+0481	Device – Cycling Computer
+0482	Device – Speed Sensor
+0483	Device – Cadence Sensor
+0484	Device – Power Sensor
+0485	Device – Speed and Cadence Sensor
+04C1	Device – Switch
+04C2	Device – Multi-switch
+04C3	Device – Button
+04C4	Device – Slider
+04C5	Device – Rotary Switch
+04C6	Device – Touch Panel
+04C7	Device – Single Switch
+04C8	Device – Double Switch
+04C9	Device – Triple Switch
+04CA	Device – Battery Switch
+04CB	Device – Energy Harvesting Switch
+04CC	Device – Push Button
+04CD	Device – Dial
+0501	Device – Access Point
+0502	Device – Mesh Device
+0503	Device – Mesh Network Proxy
+0541	Device – Motion Sensor
+0542	Device – Air quality Sensor
+0543	Device – Temperature Sensor
+0544	Device – Humidity Sensor
+0545	Device – Leak Sensor
+0546	Device – Smoke Sensor
+0547	Device – Occupancy Sensor
+0548	Device – Contact Sensor
+0549	Device – Carbon Monoxide Sensor
+054A	Device – Carbon Dioxide Sensor
+054B	Device – Ambient Light Sensor
+054C	Device – Energy Sensor
+054D	Device – Color Light Sensor
+054E	Device – Rain Sensor
+054F	Device – Fire Sensor
+0550	Device – Wind Sensor
+0551	Device – Proximity Sensor
+0552	Device – Multi-Sensor
+0553	Device – Flush Mounted Sensor
+0554	Device – Ceiling Mounted Sensor
+0555	Device – Wall Mounted Sensor
+0556	Device – Multisensor
+0557	Device – Energy Meter
+0558	Device – Flame Detector
+0559	Device – Vehicle Tire Pressure Sensor
+0581	Device – Wall Light
+0582	Device – Ceiling Light
+0583	Device – Floor Light
+0584	Device – Cabinet Light
+0585	Device – Desk Light
+0586	Device – Troffer Light
+0587	Device – Pendant Light
+0588	Device – In-ground Light
+0589	Device – Flood Light
+058A	Device – Underwater Light
+058B	Device – Bollard with Light
+058C	Device – Pathway Light
+058D	Device – Garden Light
+058E	Device – Pole-top Light
+058F	Device – Spotlight
+0590	Device – Linear Light
+0591	Device – Street Light
+0592	Device – Shelves Light
+0593	Device – Bay Light
+0594	Device – Emergency Exit Light
+0595	Device – Light Controller
+0596	Device – Light Driver
+0597	Device – Bulb
+0598	Device – Low-bay Light
+0599	Device – High-bay Light
+05C1	Device – Ceiling Fan
+05C2	Device – Axial Fan
+05C3	Device – Exhaust Fan
+05C4	Device – Pedestal Fan
+05C5	Device – Desk Fan
+05C6	Device – Wall Fan
+0601	Device – Thermostat
+0602	Device – Humidifier
+0603	Device – De-humidifier
+0604	Device – Heater
+0605	Device – Radiator
+0606	Device – Boiler
+0607	Device – Heat Pump
+0608	Device – Infrared Heater
+0609	Device – Radiant Panel Heater
+060A	Device – Fan Heater
+060B	Device – Air Curtain
+06C1	Device – Radiator
+06C2	Device – Boiler
+06C3	Device – Heat Pump
+06C4	Device – Infrared Heater
+06C5	Device – Radiant Panel Heater
+06C6	Device – Fan Heater
+06C7	Device – Air Curtain
+0701	Device – Access Door
+0702	Device – Garage Door
+0703	Device – Emergency Exit Door
+0704	Device – Access Lock
+0705	Device – Elevator
+0706	Device – Window
+0707	Device – Entrance Gate
+0708	Device – Door Lock
+0709	Device – Locker
+0741	Device – Motorized Gate
+0742	Device – Awning
+0743	Device – Blinds or Shades
+0744	Device – Curtains
+0745	Device – Screen
+0781	Device – Power Outlet
+0782	Device – Power Strip
+0783	Device – Plug
+0784	Device – Power Supply
+0785	Device – LED Driver
+0786	Device – Fluorescent Lamp Gear
+0787	Device – HID Lamp Gear
+0788	Device – Charge Case
+0789	Device – Power Bank
+07C1	Device – Incandescent Light Bulb
+07C2	Device – LED Lamp
+07C3	Device – HID Lamp
+07C4	Device – Fluorescent Lamp
+07C5	Device – LED Array
+07C6	Device – Multi-Color LED Array
+07C7	Device – Low voltage halogen
+07C8	Device – Organic light emitting diode (OLED)
+0801	Device – Window Shades
+0802	Device – Window Blinds
+0803	Device – Window Awning
+0804	Device – Window Curtain
+0805	Device – Exterior Shutter
+0806	Device – Exterior Screen
+0841	Device – Standalone Speaker
+0842	Device – Soundbar
+0843	Device – Bookshelf Speaker
+0844	Device – Standmounted Speaker
+0845	Device – Speakerphone
+0881	Device – Microphone
+0882	Device – Alarm
+0883	Device – Bell
+0884	Device – Horn
+0885	Device – Broadcasting Device
+0886	Device – Service Desk
+0887	Device – Kiosk
+0888	Device – Broadcasting Room
+0889	Device – Auditorium
+08C1	Device – Car
+08C2	Device – Large Goods Vehicle
+08C3	Device – 2-Wheeled Vehicle
+08C4	Device – Motorbike
+08C5	Device – Scooter
+08C6	Device – Moped
+08C7	Device – 3-Wheeled Vehicle
+08C8	Device – Light Vehicle
+08C9	Device – Quad Bike
+08CA	Device – Minibus
+08CB	Device – Bus
+08CC	Device – Trolley
+08CD	Device – Agricultural Vehicle
+08CE	Device – Camper / Caravan
+08CF	Device – Recreational Vehicle / Motor Home
+0901	Device – Refrigerator
+0902	Device – Freezer
+0903	Device – Oven
+0904	Device – Microwave
+0905	Device – Toaster
+0906	Device – Washing Machine
+0907	Device – Dryer
+0908	Device – Coffee maker
+0909	Device – Clothes iron
+090A	Device – Curling iron
+090B	Device – Hair dryer
+090C	Device – Vacuum cleaner
+090D	Device – Robotic vacuum cleaner
+090E	Device – Rice cooker
+090F	Device – Clothes steamer
+0941	Device – Earbud
+0942	Device – Headset
+0943	Device – Headphones
+0944	Device – Neck Band
+0945	Device – Left Earbud
+0946	Device – Right Earbud
+0981	Device – Light Aircraft
+0982	Device – Microlight
+0983	Device – Paraglider
+0984	Device – Large Passenger Aircraft
+09C1	Device – Amplifier
+09C2	Device – Receiver
+09C3	Device – Radio
+09C4	Device – Tuner
+09C5	Device – Turntable
+09C6	Device – CD Player
+09C7	Device – DVD Player
+09C8	Device – Bluray Player
+09C9	Device – Optical Disc Player
+09CA	Device – Set-Top Box
+0A01	Device – Television
+0A02	Device – Monitor
+0A03	Device – Projector
+0A41	Device – In-ear hearing aid
+0A42	Device – Behind-ear hearing aid
+0A43	Device – Cochlear Implant
+0A81	Device – Home Video Game Console
+0A82	Device – Portable handheld console
+0AC1	Device – Digital Signage
+0AC2	Device – Electronic Label
+0C41	Device – Fingertip Pulse Oximeter
+0C42	Device – Wrist Worn Pulse Oximeter
+0CC1	Device – Powered Wheelchair
+0CC2	Device – Mobility Scooter
+0D41	Device – Insulin Pump, durable pump
+0D44	Device – Insulin Pump, patch pump
+0D48	Device – Insulin Pen
+0DC1	Device – Handheld Spirometer
+1441	Device – Location Display
+1442	Device – Location and Navigation Display
+1443	Device – Location Pod
+1444	Device – Location and Navigation Pod
+1481	Device – Torque Testing Device
+1482	Device – Caliper
+1483	Device – Dial Indicator
+1484	Device – Micrometer
+1485	Device – Height Gauge
+1486	Device – Force Gauge
+14C1	Device – Machine Tool Holder
+14C2	Device – Generic Clamping Device
+14C3	Device – Clamping Jaws/Jaw Chuck
+14C4	Device – Clamping (Collet) Chuck
+14C5	Device – Clamping Mandrel
+14C6	Device – Vise
+14C7	Device – Zero-Point Clamping System
+14C8	Device – Torque Wrench
+14C9	Device – Torque Screwdriver
+1501	Device – Pot and Jugs
+1502	Device – Pressure Cooker
+1503	Device – Slow Cooker
+1504	Device – Steam Cooker
+1505	Device – Saucepan
+1506	Device – Frying Pan
+1507	Device – Casserole
+1508	Device – Dutch Oven
+1509	Device – Grill Pan/Raclette Grill/Griddle Pan
+150A	Device – Braising Pan
+150B	Device – Wok Pan
+150C	Device – Paella Pan
+150D	Device – Crepe Pan
+150E	Device – Tagine
+150F	Device – Fondue
+1510	Device – Lid
+1511	Device – Wired Probe
+1512	Device – Wireless Probe
+1513	Device – Baking Molds
+1514	Device – Baking Tray
