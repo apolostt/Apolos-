@@ -1,0 +1,13 @@
+Offline identification catalog generated for KUBA Nearby Scanner.
+
+MAC vendor assignments:
+IEEE Registration Authority public OUI registry
+https://standards-oui.ieee.org/oui/oui.csv
+
+Bluetooth company identifiers, service UUIDs and appearance values:
+Bluetooth SIG public Assigned Numbers repository
+https://bitbucket.org/bluetooth-SIG/public/src/main/assigned_numbers/
+
+The registries identify assigned organizations and protocol values. A vendor match
+does not prove the exact product model or device owner. Random/private MAC addresses
+cannot be resolved through an IEEE OUI.
