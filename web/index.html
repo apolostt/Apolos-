@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta name="theme-color" content="#07131f">
+    <title>KUBA Navigace ČR</title>
+    <link rel="stylesheet" href="./vendor/maplibre-gl.css">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<main id="app">
+    <div id="map" aria-label="Mapa České republiky"></div>
+
+    <section id="planner" class="glass planner" aria-label="Plánování trasy">
+        <div class="brand-row">
+            <button id="menuButton" class="menu-button" type="button" aria-label="Otevřít hlavní menu" aria-expanded="false">
+                <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+            </button>
+            <div class="brand-copy">
+                <strong>KUBA Navigace</strong>
+                <span>Česká republika</span>
+            </div>
+            <button id="gpsPill" class="gps-pill" type="button" aria-label="Stav GPS">
+                <i></i><span>GPS…</span>
+            </button>
+        </div>
+
+        <div class="search-wrap">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input id="searchInput" type="search" autocomplete="street-address"
+                   placeholder="Zadej adresu nebo místo…" aria-label="Cílová adresa">
+            <button id="voiceInput" class="voice-input" type="button" aria-label="Říct adresu nebo hlasový povel">
+                <span class="microphone-icon" aria-hidden="true"></span>
+            </button>
+            <button id="clearSearch" class="icon-button hidden" type="button" aria-label="Vymazat">×</button>
+        </div>
+        <div id="searchResults" class="search-results hidden" role="listbox"></div>
+
+        <div class="mode-switch" role="group" aria-label="Způsob dopravy">
+            <button class="mode active" data-mode="auto" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16v-5l2-5h12l2 5v5M5 13h14M7 17v2M17 17v2M7.5 10h9"/></svg><span>Auto</span>
+            </button>
+            <button class="mode" data-mode="pedestrian" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="13" cy="4" r="2"/><path d="m10 21 2-7-3-3-2 4M12 8l4 3 3 1M13 14l4 6"/></svg><span>Pěšky</span>
+            </button>
+            <button class="mode" data-mode="bicycle" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="17" r="4"/><circle cx="18" cy="17" r="4"/><path d="m6 17 4-8h4l4 8M9 12h7M9 7h3"/></svg><span>Kolo</span>
+            </button>
+        </div>
+        <p class="planner-tip">Klikni kamkoliv do mapy nebo vyhledej adresu. Trasa začíná z tvé živé polohy.</p>
+    </section>
+
+    <div id="drawerScrim" class="drawer-scrim" aria-hidden="true"></div>
+    <aside id="sideDrawer" class="side-drawer" aria-label="Hlavní menu" aria-hidden="true">
+        <header class="drawer-header">
+            <div class="brand-mark" aria-hidden="true">K</div>
+            <div><strong>KUBA Navigace</strong><small>Rychlé nástroje</small></div>
+            <span class="version-chip">v1.9.1</span>
+            <button id="closeDrawer" class="drawer-close" type="button" aria-label="Zavřít hlavní menu">×</button>
+        </header>
+
+        <div class="drawer-scroll">
+            <section class="share-quick-panel" aria-label="Rychlé sdílení polohy">
+                <div class="drawer-label">POLOHA</div>
+                <div class="share-quick-actions">
+                    <button id="createShareCode" class="share-quick-button share-now" type="button">
+                        <span class="share-quick-icon" aria-hidden="true">↗</span>
+                        <span><strong>Sdílet polohu</strong><small id="shareGpsStatus">Čekám na přesnou GPS…</small></span>
+                    </button>
+                    <button id="openSharedLocationDialog" class="share-quick-button receive-now" type="button">
+                        <span class="share-quick-icon" aria-hidden="true">↓</span>
+                        <span><strong>Vložit polohu</strong><small>Načíst kód ze schránky</small></span>
+                    </button>
+                </div>
+            </section>
+
+            <details id="routeMenuGroup" class="drawer-group">
+                <summary>
+                    <span class="drawer-group-icon" aria-hidden="true">◎</span>
+                    <span><strong>Trasa a moje místa</strong><small>Domov, práce, oblíbené a volby trasy</small></span>
+                    <b aria-hidden="true">⌄</b>
+                </summary>
+                <div class="drawer-group-content">
+                    <div class="drawer-shortcuts" aria-label="Rychlé cíle a volby">
+                        <button id="homeQuick" class="drawer-shortcut" type="button"><span aria-hidden="true">⌂</span><b>Domů</b></button>
+                        <button id="workQuick" class="drawer-shortcut" type="button"><span aria-hidden="true">◇</span><b>Práce</b></button>
+                        <button id="placesButton" class="drawer-shortcut" type="button"><span aria-hidden="true">★</span><b>Místa</b></button>
+                        <button id="routeOptionsButton" class="drawer-shortcut" type="button"><span aria-hidden="true">≋</span><b>Volby trasy</b></button>
+                    </div>
+                </div>
+            </details>
+
+            <details id="satelliteMenuGroup" class="drawer-group satellite-group">
+                <summary>
+                    <span class="drawer-group-icon satellite-group-icon" aria-hidden="true"><i></i></span>
+                    <span><strong>Satelity a přesnost</strong><small id="satelliteSummary">Čekám na GNSS signál…</small></span>
+                    <b aria-hidden="true">⌄</b>
+                </summary>
+                <div class="drawer-group-content satellite-panel">
+                    <div class="satellite-stats">
+                        <div><strong id="satelliteUsed">0</strong><small>použito</small></div>
+                        <div><strong id="satelliteVisible">0</strong><small>viditelných</small></div>
+                        <div><strong id="constellationCount">0</strong><small>systémů</small></div>
+                    </div>
+                    <div id="gnssQualityCard" class="gnss-quality-card" data-quality="waiting">
+                        <span id="gnssQualityBadge" aria-hidden="true">…</span>
+                        <span><strong id="gnssQualityTitle">Čekám na fix</strong><small id="gnssQualityDetail">Telefon zatím neurčil kvalitu polohy</small></span>
+                    </div>
+                    <div id="satelliteSky" class="satellite-sky" aria-label="Poloha satelitů na obloze">
+                        <span class="sky-north">S</span><span class="sky-east">V</span>
+                        <span class="sky-south">J</span><span class="sky-west">Z</span>
+                        <i class="sky-ring inner"></i><i class="sky-cross horizontal"></i><i class="sky-cross vertical"></i>
+                    </div>
+                    <div id="constellationLegend" class="constellation-legend"></div>
+                    <div class="satellite-filter" role="group" aria-label="Filtr satelitů">
+                        <button type="button" data-satellite-filter="used" aria-pressed="false">Použité <b id="satelliteUsedFilterCount">0</b></button>
+                        <button type="button" data-satellite-filter="all" aria-pressed="true">Všechny <b id="satelliteAllFilterCount">0</b></button>
+                    </div>
+                    <div class="satellite-list-head"><strong id="satelliteListHeading">Všechny zachycené satelity</strong><small>Síla dB-Hz</small></div>
+                    <div id="satelliteList" class="satellite-list">
+                        <p>Čekám na údaje přijímače telefonu…</p>
+                    </div>
+                    <p class="satellite-note">Zelené satelity telefon právě používá pro výpočet polohy.</p>
+                </div>
+            </details>
+
+            <details id="historyMenuGroup" class="drawer-group">
+                <summary>
+                    <span class="drawer-group-icon history-group-icon" aria-hidden="true">↺</span>
+                    <span><strong>Historie jízd</strong><small id="tripHistorySummary">Zatím bez dokončené jízdy</small></span>
+                    <b aria-hidden="true">⌄</b>
+                </summary>
+                <div class="drawer-group-content">
+                    <div id="tripHistoryPreview" class="history-preview"></div>
+                    <button id="openTripHistory" class="history-open" type="button">Zobrazit celou historii <b aria-hidden="true">›</b></button>
+                </div>
+            </details>
+
+            <details id="mapMenuGroup" class="drawer-group">
+                <summary>
+                    <span class="drawer-group-icon map-group-icon" aria-hidden="true">≋</span>
+                    <span><strong>Mapy a provoz</strong><small>Detailní mapa, offline data a nehody</small></span>
+                    <b aria-hidden="true">⌄</b>
+                </summary>
+                <nav id="toolsDock" class="drawer-tools drawer-group-content" aria-label="Mapové nástroje">
+                    <button id="trafficButton" class="drawer-tool" type="button">
+                        <span class="drawer-tool-icon traffic-tool-icon" aria-hidden="true">!</span>
+                        <span><strong>Nehody a uzavírky</strong><small>Živá dopravní mapa ŘSD / NDIC</small></span><b aria-hidden="true">›</b>
+                    </button>
+                    <button id="offlineButton" class="drawer-tool" type="button">
+                        <span class="drawer-tool-icon offline-tool-icon" aria-hidden="true">⇩<i id="offlineDot"></i></span>
+                        <span><strong>Offline mapa České republiky</strong><small>Bright Detail+ · uložení a aktualizace</small></span><b aria-hidden="true">›</b>
+                    </button>
+                    <button id="mapToolsButton" class="drawer-tool" type="button">
+                        <span class="drawer-tool-icon layers-tool-icon" aria-hidden="true">≋</span>
+                        <span><strong>Vzhled a podrobnosti mapy</strong><small>Čísla domů, 3D budovy a síť</small></span><b aria-hidden="true">›</b>
+                    </button>
+                </nav>
+            </details>
+            <p class="drawer-privacy">Sdílecí kód je snímek polohy. Po odeslání se sám neaktualizuje a nikoho nesleduje na pozadí.</p>
+        </div>
+    </aside>
+
+    <div id="sharedLocationScrim" class="sheet-scrim hidden" aria-hidden="true"></div>
+    <section id="sharedLocationSheet" class="glass shared-location-sheet hidden" role="dialog"
+             aria-modal="true" aria-labelledby="sharedLocationTitle">
+        <header class="sheet-header">
+            <div><small>SDÍLENÁ POLOHA</small><h2 id="sharedLocationTitle">Vložit polohu</h2></div>
+            <button id="closeSharedLocation" class="sheet-close" type="button" aria-label="Zavřít vložení polohy">×</button>
+        </header>
+        <div class="shared-location-hero">
+            <span aria-hidden="true">◎</span>
+            <div><strong>Automatické otevření</strong><small>Platný kód označí místo a spočítá trasu z tvé GPS.</small></div>
+        </div>
+        <div class="share-input-row">
+            <input id="locationCodeInput" type="text" maxlength="1024" autocomplete="off"
+                   autocapitalize="characters" spellcheck="false" placeholder="KUBA1…" aria-label="Kód sdílené polohy">
+            <button id="pasteLocationCode" type="button">Vložit</button>
+        </div>
+        <p id="sharedCodeInfo" class="shared-code-info">Načítám kód ze schránky…</p>
+        <button id="openSharedLocation" class="share-secondary" type="button">Označit místo a naplánovat trasu</button>
+    </section>
+
+    <button id="recenter" class="map-fab recenter" type="button" aria-label="Vycentrovat mapu na moji polohu">
+        <span class="target-icon" aria-hidden="true"></span><span class="follow-car-icon" aria-hidden="true"></span><b>Sledovat auto</b>
+    </button>
+
+    <section id="mapToolsSheet" class="glass map-tools-sheet hidden" aria-label="Offline mapy a provoz">
+        <header class="tools-header">
+            <div>
+                <small>MAPY A PROVOZ</small>
+                <h2>Česko vždy po ruce</h2>
+            </div>
+            <span class="version-chip">v1.9.1</span>
+            <button id="closeMapTools" class="sheet-close" type="button" aria-label="Zavřít nastavení">×</button>
+        </header>
+
+        <button id="openTraffic" class="traffic-card" type="button">
+            <span class="traffic-sign" aria-hidden="true">!</span>
+            <span><strong>Živé nehody a uzavírky</strong><small>Oficiální dopravní mapa ŘSD / NDIC</small></span>
+            <b aria-hidden="true">›</b>
+        </button>
+
+        <div class="gps-quality-card">
+            <div class="gps-quality-head">
+                <span class="gps-orbit" aria-hidden="true"><i></i></span>
+                <span><strong>Přesnost a stabilita polohy</strong><small id="gpsQualityDetails">Čekám na údaje z GPS…</small></span>
+            </div>
+            <div class="location-profile" role="group" aria-label="Profil měření polohy">
+                <button type="button" data-location-profile="precise"><strong>Přesná</strong><small>Navigace</small></button>
+                <button type="button" data-location-profile="balanced"><strong>Vyvážená</strong><small>Běžně</small></button>
+                <button type="button" data-location-profile="battery"><strong>Úsporná</strong><small>Baterie</small></button>
+            </div>
+        </div>
+
+        <div class="map-category-card">
+            <div class="map-category-head">
+                <span><strong>Co ukázat přímo v mapě</strong><small>Jednotlivé vrstvy lze libovolně kombinovat</small></span>
+                <b id="poiCategoryCount">3 zapnuté</b>
+            </div>
+            <div class="poi-category-grid" role="group" aria-label="Kategorie míst v mapě">
+                <button type="button" data-poi-category="shops" aria-pressed="true"><i></i><span>Obchody</span></button>
+                <button type="button" data-poi-category="food" aria-pressed="true"><i></i><span>Jídlo</span></button>
+                <button type="button" data-poi-category="mobility" aria-pressed="true"><i></i><span>Auto</span></button>
+                <button type="button" data-poi-category="health" aria-pressed="false"><i></i><span>Zdraví</span></button>
+                <button type="button" data-poi-category="services" aria-pressed="false"><i></i><span>Služby</span></button>
+                <button type="button" data-poi-category="transport" aria-pressed="false"><i></i><span>Doprava</span></button>
+                <button type="button" data-poi-category="lodging" aria-pressed="false"><i></i><span>Ubytování</span></button>
+                <button type="button" data-poi-category="leisure" aria-pressed="false"><i></i><span>Volný čas</span></button>
+            </div>
+            <p>Názvy a poloha míst jsou součástí detailních vektorových map a fungují i z uložených dlaždic.</p>
+        </div>
+
+        <div class="offline-card">
+            <div class="offline-title">
+                <span class="download-ring" aria-hidden="true">⇩</span>
+                <div><strong>Bright Detail+ · celá ČR</strong><small id="mapCacheStatus">Zjišťuji stav…</small></div>
+                <b id="mapCacheSize">0 MB</b>
+            </div>
+            <div id="mapProgressTrack" class="progress-track hidden"><i id="mapProgressBar"></i></div>
+            <div class="coverage-row">
+                <span>Celá ČR <b>do z12</b></span><span>Podél trasy <b>do z14</b></span><span>Uložení <b>trvalé</b></span>
+            </div>
+            <button id="downloadMaps" class="download-button" type="button">Stáhnout / aktualizovat mapy</button>
+            <p>Detailnější vektorový styl Bright ukládá celou ČR do úrovně ulic. Při plánování se automaticky stáhne nejvyšší dostupný detail z14 podél trasy včetně budov a čísel domů.</p>
+        </div>
+
+        <div class="settings-list">
+            <label class="setting-row">
+                <span><strong>Aktualizovat při spuštění</strong><small>Stáhnou se jen nová nebo chybějící data</small></span>
+                <input id="autoMapUpdate" type="checkbox" checked><i class="switch"></i>
+            </label>
+            <label class="setting-row">
+                <span><strong>Velké stahování jen přes Wi‑Fi</strong><small>Ruční tlačítko může použít i mobilní data</small></span>
+                <input id="wifiOnly" type="checkbox" checked><i class="switch"></i>
+            </label>
+            <label class="setting-row">
+                <span><strong>Čísla popisná a orientační</strong><small>Zobrazit při přiblížení ulic</small></span>
+                <input id="houseNumbers" type="checkbox" checked><i class="switch"></i>
+            </label>
+            <label class="setting-row">
+                <span><strong>3D budovy</strong><small>Detailnější pohled ve městě a při navigaci</small></span>
+                <input id="buildings3d" type="checkbox" checked><i class="switch"></i>
+            </label>
+            <label class="setting-row">
+                <span><strong>Barevné budovy ve 2D i 3D</strong><small>Skutečná barva z mapy nebo přehledná výšková paleta</small></span>
+                <input id="buildingColors" type="checkbox" checked><i class="switch"></i>
+            </label>
+            <label class="setting-row">
+                <span><strong>Cyklostezky a pěší cesty</strong><small>Barevně zvýraznit oddělené stezky a povolené cesty</small></span>
+                <input id="cycleways" type="checkbox" checked><i class="switch"></i>
+            </label>
+            <label class="setting-row">
+                <span><strong>Dopravní značky a ukazatele</strong><small id="mapSignsDetail">Čísla silnic a přesné polohy značek v okolí</small></span>
+                <input id="mapSigns" type="checkbox" checked><i class="switch"></i>
+            </label>
+            <label class="setting-row">
+                <span><strong>Plynulý symbol polohy</strong><small>Vyhladí drobné skoky GPS bez zpomalení přepočtu</small></span>
+                <input id="smoothLocation" type="checkbox" checked><i class="switch"></i>
+            </label>
+            <label class="setting-row">
+                <span><strong>Přichytit symbol k trase</strong><small>Auto a kolo zůstanou na silnici při přesném GPS signálu</small></span>
+                <input id="snapToRoute" type="checkbox" checked><i class="switch"></i>
+            </label>
+        </div>
+        <button id="clearMapCache" class="clear-cache" type="button">Vymazat uložené mapy</button>
+    </section>
+
+    <section id="tripHistorySheet" class="glass bottom-sheet trip-history-sheet hidden" aria-label="Historie jízd">
+        <header class="sheet-header">
+            <div><small>HISTORIE JÍZD</small><h2>Tvoje poslední cesty</h2></div>
+            <button id="closeTripHistory" class="sheet-close" type="button" aria-label="Zavřít historii jízd">×</button>
+        </header>
+        <div class="history-stats">
+            <div><strong id="historyTrips">0</strong><small>jízd</small></div>
+            <div><strong id="historyDistance">0 km</strong><small>celkem</small></div>
+            <div><strong id="historyTime">0 min</strong><small>na cestě</small></div>
+        </div>
+        <div id="tripHistoryList" class="trip-history-list"></div>
+        <button id="clearTripHistory" class="clear-cache" type="button">Vymazat historii jízd</button>
+        <p class="history-privacy">Historie je uložená jen v tomto telefonu a nikam se neodesílá.</p>
+    </section>
+
+    <section id="placesSheet" class="glass bottom-sheet places-sheet hidden" aria-label="Uložená místa">
+        <header class="sheet-header">
+            <div><small>MOJE MÍSTA</small><h2>Kam pojedeme?</h2></div>
+            <button id="closePlaces" class="sheet-close" type="button" aria-label="Zavřít uložená místa">×</button>
+        </header>
+        <div class="special-places">
+            <div class="special-place">
+                <span class="place-symbol home-symbol" aria-hidden="true">⌂</span>
+                <div><strong>Domov</strong><small id="homeLabel">Zatím nenastaveno</small></div>
+                <button id="homeGo" class="place-go hidden" type="button">Jet</button>
+                <button id="homeSave" class="place-save" type="button" aria-label="Uložit vybraný cíl jako Domov">＋</button>
+            </div>
+            <div class="special-place">
+                <span class="place-symbol work-symbol" aria-hidden="true">◇</span>
+                <div><strong>Práce</strong><small id="workLabel">Zatím nenastaveno</small></div>
+                <button id="workGo" class="place-go hidden" type="button">Jet</button>
+                <button id="workSave" class="place-save" type="button" aria-label="Uložit vybraný cíl jako Práce">＋</button>
+            </div>
+        </div>
+        <div class="places-title"><strong>Oblíbené</strong><small>Až 12 míst</small></div>
+        <div id="favoritesList" class="places-list"></div>
+        <div class="places-title"><strong>Poslední cíle</strong><button id="clearRecent" type="button">Vymazat</button></div>
+        <div id="recentList" class="places-list"></div>
+    </section>
+
+    <section id="routeOptionsSheet" class="glass bottom-sheet route-options-sheet hidden" aria-label="Volby trasy">
+        <header class="sheet-header">
+            <div><small>VÝPOČET TRASY</small><h2>Volby pro lepší cestu</h2></div>
+            <button id="closeRouteOptions" class="sheet-close" type="button" aria-label="Zavřít volby trasy">×</button>
+        </header>
+        <p id="routeOptionsHint" class="options-hint">Volby se zapamatují a zachovají i při automatickém přepočítání.</p>
+        <div class="settings-list route-settings">
+            <label class="setting-row auto-option">
+                <span><strong>Vyhnout se dálnicím</strong><small>Auto pojede po běžných silnicích, pokud je to možné</small></span>
+                <input id="avoidHighways" type="checkbox"><i class="switch"></i>
+            </label>
+            <label class="setting-row auto-option">
+                <span><strong>Vyhnout se placeným úsekům</strong><small>Omezí dálnice a jiné úseky vyžadující poplatek</small></span>
+                <input id="avoidTolls" type="checkbox"><i class="switch"></i>
+            </label>
+            <label class="setting-row bike-option">
+                <span><strong>Preferovat cyklostezky</strong><small>Méně běžných silnic a klidnější vedení trasy</small></span>
+                <input id="preferCycleways" type="checkbox"><i class="switch"></i>
+            </label>
+            <label class="setting-row bike-option">
+                <span><strong>Méně kopců</strong><small>Upřednostní pohodlnější profil pro kolo</small></span>
+                <input id="gentleRoute" type="checkbox"><i class="switch"></i>
+            </label>
+            <label class="setting-row">
+                <span><strong>Vyhnout se trajektům</strong><small>Platí pro auto, pěší trasu i kolo</small></span>
+                <input id="avoidFerries" type="checkbox"><i class="switch"></i>
+            </label>
+        </div>
+        <button id="applyRouteOptions" class="download-button options-apply" type="button">Použít a přepočítat trasu</button>
+    </section>
+
+    <section id="permissionCard" class="glass permission-card hidden" aria-live="polite">
+        <div class="permission-icon">◎</div>
+        <div>
+            <h1>Zapnout přesnou GPS</h1>
+            <p>Pro trasu, živou rychlost a navigaci na pozadí potřebuje aplikace přesnou polohu.</p>
+        </div>
+        <button id="allowGps" class="primary-button" type="button">Povolit přesnou polohu</button>
+        <button id="gpsSettings" class="secondary-button hidden" type="button">Zapnout polohu v telefonu</button>
+    </section>
+
+    <section id="routeSheet" class="glass route-sheet hidden" aria-live="polite">
+        <button id="closeRoute" class="sheet-close" type="button" aria-label="Zavřít trasu">×</button>
+        <button id="favoriteRoute" class="favorite-route" type="button" aria-label="Přidat cíl do oblíbených" aria-pressed="false">☆</button>
+        <div class="route-destination">
+            <small>CÍL · <b id="routeMode">Auto</b></small>
+            <strong id="routeDestination">Vybrané místo</strong>
+        </div>
+        <div class="route-stats">
+            <div><span id="routeDistance">—</span><small>vzdálenost</small></div>
+            <div><span id="routeTime">—</span><small>odhad času</small></div>
+            <div><span id="routeArrival">—</span><small>příjezd</small></div>
+        </div>
+        <div class="route-actions">
+            <button id="startNavigation" class="start-button" type="button">
+                <span>Spustit navigaci</span><b>➜</b>
+            </button>
+            <button id="simulateRoute" class="simulate-button" type="button" aria-label="Vyzkoušet trasu bez GPS"><b>▶</b><span>Simulace</span></button>
+        </div>
+        <div class="online-note">Mapa se ukládá offline; nový výpočet trasy a živý provoz používají internet.</div>
+    </section>
+
+    <div id="loading" class="loading hidden" role="status">
+        <div class="spinner"></div><span>Počítám nejlepší trasu…</span>
+    </div>
+
+    <section id="driverHud" class="driver-hud hidden" aria-label="Aktivní navigace">
+        <div class="driver-top glass-dark">
+            <button id="stopNavigation" class="stop-button" type="button" aria-label="Ukončit navigaci">×</button>
+            <div class="driver-trip">
+                <strong id="remainingDistance">—</strong>
+                <span id="remainingTime">—</span>
+            </div>
+            <div id="driverGps" class="driver-gps">GPS…</div>
+            <button id="driverVoiceCommand" class="voice-command-button" type="button" aria-label="Říct hlasový povel">
+                <span class="microphone-icon" aria-hidden="true"></span>
+            </button>
+            <button id="driverTraffic" class="driver-traffic" type="button" aria-label="Zobrazit nehody a uzavírky">
+                <span aria-hidden="true">!</span>
+            </button>
+            <button id="voiceToggle" class="voice-button active" type="button"
+                    aria-label="Vypnout hlasové pokyny" aria-pressed="true">
+                <span class="speaker-icon" aria-hidden="true"></span>
+            </button>
+        </div>
+
+        <div id="guideSign" class="guide-sign hidden" aria-live="polite">
+            <span id="guideSignArrow" class="guide-sign-arrow" aria-hidden="true">↑</span>
+            <span class="guide-sign-body">
+                <b id="guideSignPlace">—</b>
+                <small id="guideSignVia"></small>
+            </span>
+            <span id="guideSignKm" class="guide-sign-km">—</span>
+        </div>
+
+        <div id="rerouteBadge" class="reroute-badge hidden" role="status">
+            <i></i><span>Přepočítávám trasu</span>
+        </div>
+        <div id="simulationBadge" class="simulation-badge hidden" role="status">SIMULACE ×20</div>
+
+        <div id="overspeed" class="overspeed hidden">ZPOMALIT</div>
+
+        <div id="driverRoadSign" class="driver-road-sign glass-dark hidden" aria-live="polite">
+            <span id="driverRoadSignBadge" data-kind="other" aria-hidden="true">!</span>
+            <span><small id="driverRoadSignEyebrow">ZNAČKA U TRASY</small><strong id="driverRoadSignTitle">Dopravní značka</strong></span>
+            <b id="driverRoadSignDistance">—</b>
+        </div>
+
+        <div class="turn-stack">
+            <div id="primaryTurnCard" class="turn-card primary-turn">
+                <div id="primaryArrow" class="turn-arrow">↑</div>
+                <div class="turn-copy glass-dark">
+                    <strong id="primaryDistance">—</strong>
+                    <span id="primaryInstruction">Pokračuj po trase</span>
+                    <div class="turn-progress" aria-hidden="true"><i id="turnProgressBar"></i></div>
+                </div>
+            </div>
+            <div id="secondaryTurn" class="turn-card secondary-turn hidden">
+                <div id="secondaryArrow" class="turn-arrow">↗</div>
+                <div class="turn-copy glass-dark">
+                    <small>POTOM</small>
+                    <strong id="secondaryDistance">—</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="speed-cluster">
+            <div id="speedLimitSign" class="speed-limit unknown"><small>LIMIT</small><strong>—</strong></div>
+            <div id="speedCircle" class="speed-circle glass-dark">
+                <strong id="liveSpeed">0</strong><span>km/h</span>
+            </div>
+        </div>
+    </section>
+
+    <div id="toast" class="toast hidden" role="status"></div>
+</main>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
